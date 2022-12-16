@@ -1,0 +1,39 @@
+.input .MuiTextField-root {
+  width: 50%;
+
+}
+
+.input .MuiOutlinedInput-root {
+  background: #f0f0f0;
+  color: #000000;
+}
+
+.image-preview {
+  position: relative;
+  width: 300px;
+  height: 300px;
+  margin: 20px;
+}
+
+.image-preview img {
+  width: 300px;
+  height: 300px;
+  object-fit: cover;
+}
+
+.images-preview-container {
+  display: auto;
+  justify-content: center;
+}
+
+.close-icon {
+  position: absolute;
+  top: 0;
+  left: 0;
+  font-size: 20px;
+}
+
+.close-icon:hover {
+  cursor: pointer;
+  color: red;
+}

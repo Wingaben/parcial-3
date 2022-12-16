@@ -1,0 +1,49 @@
+{
+  "name": "landbnb-client",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "postinstall": "npm rebuild node-sass && npm install --unsafe-perm -f node-sass",
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@emotion/react": "^11.10.5",
+    "@emotion/styled": "^11.10.5",
+    "@fontsource/roboto": "^4.5.8",
+    "@mui/icons-material": "^5.10.15",
+    "@mui/lab": "^5.0.0-alpha.108",
+    "@mui/material": "^5.10.15",
+    "@mui/x-date-pickers": "^5.0.9",
+    "@mui/x-date-pickers-pro": "^5.0.9",
+    "@paypal/react-paypal-js": "^7.8.2",
+    "@react-oauth/google": "^0.5.0",
+    "axios": "^1.2.0",
+    "cypress": "^11.2.0",
+    "date-fns": "^2.29.3",
+    "dayjs": "^1.11.6",
+    "esbuild": "^0.15.16",
+    "gapi-script": "^1.2.0",
+    "jwt-decode": "^3.1.2",
+    "leaflet": "^1.9.2",
+    "moment": "^2.29.4",
+    "mui-image": "^1.0.7",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-hooks-global-state": "^2.0.0",
+    "react-icons": "^4.6.0",
+    "react-leaflet": "^4.1.0",
+    "react-paypal-js": "^0.0.1-security",
+    "react-router-dom": "^6.4.3",
+    "react-share": "^4.4.1",
+    "react-swipeable-views-utils": "^0.14.0"
+  },
+  "devDependencies": {
+    "@types/react": "^18.0.22",
+    "@types/react-dom": "^18.0.7",
+    "@vitejs/plugin-react": "^2.2.0",
+    "vite": "^3.2.3"
+  }
+}
