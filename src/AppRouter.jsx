@@ -19,7 +19,7 @@ import Messenger from "./assets/components/Messenger/Messenger";
 import AnadirResena from "./AnadirResena";
 import Provider from "./UsuarioContext";
 import Payments from "./Payments"
-
+import Map from "./assets/components/Map/Map"
 const AppRouter = () => {
     return (
         <Router>
@@ -28,6 +28,7 @@ const AppRouter = () => {
                 <Routes>
                     <Route path="/" element={<Inicio />} />
                     <Route path="/Payments" element={<Payments />} />
+                    <Route path="/Map" element={<Map />} />
                     <Route path="/CrearAlojamiento" element={<CrearAlojamiento />} />
                     <Route path="/MisAlojamientos" element={<MisAlojamientos />} />
                     <Route path="/VerAlojamiento/:id" element={<VerAlojamiento />} />

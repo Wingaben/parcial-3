@@ -2,6 +2,7 @@ import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
 import Toolbar from "@mui/material/Toolbar";
 import IconButton from "@mui/material/IconButton";
+import Button from "@mui/material/Button"
 import Typography from "@mui/material/Typography";
 import Menu from "@mui/material/Menu";
 import Container from "@mui/material/Container";
@@ -19,6 +20,9 @@ import jwt_decode from "jwt-decode";
 function NavBar() {
   const [anchorElUser, setAnchorElUser] = React.useState(null);
   const { user, setUser } = useContext(UsuarioContext);
+  const [id, setId] = useState(0);
+  const [timestamp, setTimestamp] = useState(0);
+  const [email, setEmail] = useState(0);
 
   const handleOpenUserMenu = (event) => {
     setAnchorElUser(event.currentTarget);
@@ -30,6 +34,8 @@ function NavBar() {
   };
 
   const registrarUsuario = (decode) => {
+    setId(decode.sub);
+    setEmail(decode.email);
     const id = decode.sub;
     const email = decode.email;
     const nombre = decode.given_name;
@@ -52,7 +58,6 @@ function NavBar() {
     <AppBar position="static">
       <Container maxWidth="xxl">
         <Toolbar disableGutters>
-
           <Link to="/" style={{ textDecoration: "none" }}>
             <Typography
               variant="h6"
@@ -63,7 +68,7 @@ function NavBar() {
                 color: "white",
               }}
             >
-              APLICACION
+              EMTInfo
             </Typography>
           </Link>
 
@@ -83,7 +88,7 @@ function NavBar() {
               textDecoration: "none",
             }}
           >
-            APLICACION
+            EMTInfo
           </Typography>
           <Box sx={{ flexGrow: 1, display: { xs: "none", md: "flex" } }}></Box>
           <Box sx={{ flexGrow: 0 }}>
@@ -106,6 +111,7 @@ function NavBar() {
                   var decoded = jwt_decode(credentialResponse.credential);
                   setUser(decoded);
                   registrarUsuario(decoded);
+                  console.log(decoded);
                   sessionStorage.setItem("authSub", JSON.stringify(decoded))
                 }}
                 onError={() => {
@@ -130,54 +136,6 @@ function NavBar() {
               open={Boolean(anchorElUser)}
               onClose={handleCloseUserMenu}
             >
-              <MenuItem
-                component={Link}
-                to="/MiPerfil"
-                onClick={() => handleCloseUserMenu()}
-              >
-                <Typography textAlign="center">Mi perfil</Typography>
-              </MenuItem>
-
-              <MenuItem
-                component={Link}
-                to="/MisMensajes"
-                onClick={() => handleCloseUserMenu()}
-              >
-                <Typography textAlign="center">Mis Mensajes</Typography>
-              </MenuItem>
-
-              <MenuItem
-                component={Link}
-                to="/CrearAlojamiento"
-                onClick={() => handleCloseUserMenu()}
-              >
-                <Typography textAlign="center">Añadir alojamiento</Typography>
-              </MenuItem>
-
-              <MenuItem
-                component={Link}
-                to="/MisAlojamientos"
-                onClick={() => handleCloseUserMenu()}
-              >
-                <Typography textAlign="center">Mis alojamientos</Typography>
-              </MenuItem>
-
-              <MenuItem
-                component={Link}
-                to="/MisReservas"
-                onClick={() => handleCloseUserMenu()}
-              >
-                <Typography textAlign="center">Mis reservas</Typography>
-              </MenuItem>
-
-              <MenuItem
-                component={Link}
-                to="/MisSolicitudes"
-                onClick={() => handleCloseUserMenu()}
-              >
-                <Typography textAlign="center">Mis solicitudes</Typography>
-              </MenuItem>
-
               <MenuItem onClick={() => {
                 sessionStorage.clear();
                 googleLogout()
