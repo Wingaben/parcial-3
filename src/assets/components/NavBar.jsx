@@ -23,16 +23,13 @@ function NavBar() {
   const [id, setId] = useState(0);
   const [timestamp, setTimestamp] = useState(0);
   const [email, setEmail] = useState(0);
-
   const handleOpenUserMenu = (event) => {
     setAnchorElUser(event.currentTarget);
 
   };
-
   const handleCloseUserMenu = () => {
     setAnchorElUser(null);
   };
-
   const registrarUsuario = (decode) => {
     setId(decode.sub);
     setEmail(decode.email);
@@ -46,14 +43,12 @@ function NavBar() {
       nombre,
       apellidos,
     };
-
     fetch("http://localhost:8081/api/usuarios", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(usuario),
     });
   };
-
   return (
     <AppBar position="static">
       <Container maxWidth="xxl">
@@ -72,7 +67,6 @@ function NavBar() {
               EMTInfo
             </Typography>
           </Link>
-
           <Typography
             variant="h5"
             noWrap
@@ -137,13 +131,6 @@ function NavBar() {
               open={Boolean(anchorElUser)}
               onClose={handleCloseUserMenu}
             >
-              <MenuItem onClick={() => {
-                alert("Timestamp: " + " Usuario: " + email + " Token: " + id)
-              }} component="a" href="/">
-                <Typography textAlign="center">Log</Typography>
-              </MenuItem>
-              
-
               <MenuItem onClick={() => {
                 sessionStorage.clear();
                 googleLogout()

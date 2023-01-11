@@ -118,7 +118,7 @@ function Inicio() {
 
     return position === null ? null : (
       <Marker position={position}>
-        <Popup>Tu alojamiento se encuentra aquí.</Popup>
+        <Popup>Estás aquí</Popup>
       </Marker>
     );
   };
@@ -130,20 +130,10 @@ function Inicio() {
             variant="contained"
             color="secondary"
             onClick={() => {
-              alert("Timestamp: " + " Usuario: " + data.email + " Token: " + data.id)
+              alert("Timestamp: " + "\nUsuario: " + user.email + "\nToken: " + user.sub)
             }}
           >
             LOG
-          </Button>
-          <br/>
-          <Button
-            variant="contained"
-            color="secondary"
-            onClick={() => {
-              alert("Te quiero mucho :3")
-            }}
-          >
-            Quiero aprobar Ingeniería Web, Pu
           </Button>
           <MapContainer
             center={[36.72016, -4.42034]}
