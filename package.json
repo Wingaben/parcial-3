@@ -7,7 +7,8 @@
     "postinstall": "npm rebuild node-sass && npm install --unsafe-perm -f node-sass",
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "deploy": "gh-pages -d dist"
   },
   "dependencies": {
     "@emotion/react": "^11.10.5",
