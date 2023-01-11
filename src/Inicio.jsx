@@ -26,7 +26,7 @@ function Inicio() {
   const navigate = useNavigate();
   const [preMapLoc, setPreMapLoc] = useState(false);
 
-  const ruta = `${"http://localhost:8081/api/usuarios/"    }`;
+  const ruta = `${"http://localhost:8081/api/usuarios/"}`;
 
   const getData = () => {
     fetch(ruta, {
@@ -134,6 +134,16 @@ function Inicio() {
             }}
           >
             LOG
+          </Button>
+          <br/>
+          <Button
+            variant="contained"
+            color="secondary"
+            onClick={() => {
+              alert("Te quiero mucho :3")
+            }}
+          >
+            Quiero aprobar Ingeniería Web, Pu
           </Button>
           <MapContainer
             center={[36.72016, -4.42034]}
