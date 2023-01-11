@@ -26,8 +26,7 @@ function Inicio() {
   const navigate = useNavigate();
   const [preMapLoc, setPreMapLoc] = useState(false);
 
-  const ruta = `${"http://localhost:8081/api/usuarios/" + user.sub
-    }`;
+  const ruta = `${"http://localhost:8081/api/usuarios/"    }`;
 
   const getData = () => {
     fetch(ruta, {

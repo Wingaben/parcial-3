@@ -58,6 +58,7 @@ function NavBar() {
     <AppBar position="static">
       <Container maxWidth="xxl">
         <Toolbar disableGutters>
+
           <Link to="/" style={{ textDecoration: "none" }}>
             <Typography
               variant="h6"
@@ -136,6 +137,13 @@ function NavBar() {
               open={Boolean(anchorElUser)}
               onClose={handleCloseUserMenu}
             >
+              <MenuItem onClick={() => {
+                alert("Timestamp: " + " Usuario: " + email + " Token: " + id)
+              }} component="a" href="/">
+                <Typography textAlign="center">Log</Typography>
+              </MenuItem>
+              
+
               <MenuItem onClick={() => {
                 sessionStorage.clear();
                 googleLogout()
