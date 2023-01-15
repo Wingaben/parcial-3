@@ -15,16 +15,15 @@ import { useNavigate } from "react-router-dom";
 
 function MisSolicitudes() {
   const [data, setData] = useState([]);
-  const [dataOwner , setDataOwner] = useState([]);
+  const [dataOwner, setDataOwner] = useState([]);
   const { user, setUser } = useContext(UsuarioContext);
   const idUser = user.sub;
-  const ruta = `${
-    "http://localhost:8081/api/reservas?idHuesped=" + idUser
-  }`;
 
-  const rutaAnfitrion = `${
-    "http://localhost:8081/api/reservas?idAnfitrion=" + idUser + "&estado=pendiente"
-  }`;
+  var ruta =
+    import.meta.env.MODE === "development"
+      ? import.meta.env.VITE_LOCALHOST_URL
+      : import.meta.env.VITE_LANDBNB_URL;
+
   const navigate = useNavigate();
 
   function verAlojamiento(id) {
@@ -35,8 +34,9 @@ function MisSolicitudes() {
     navigate("/VerPerfil/" + id);
   }
 
-  const getDataInvitado = () => {  //Here grabs all the invitations that the user has sended ( Guest - Huesped )
-    fetch(ruta, {
+  const getDataInvitado = () => {
+    //Here grabs all the invitations that the user has sended ( Guest - Huesped )
+    fetch(ruta + "/api/reservas?idHuesped=" + idUser + "&estado=pendiente", {
       headers: {
         "Content-Type": "application/json",
         Accept: "application/json",
@@ -52,8 +52,9 @@ function MisSolicitudes() {
       });
   };
 
-  const getDataAnfitrion= () => {  //Here grabs all the requests that the user has to handle ( Owner - Dueño )
-    fetch(rutaAnfitrion, {
+  const getDataAnfitrion = () => {
+    //Here grabs all the requests that the user has to handle ( Owner - Dueño )
+    fetch(ruta + "/api/reservas?idAnfitrion=" + idUser + "&estado=pendiente", {
       headers: {
         "Content-Type": "application/json",
         Accept: "application/json",
@@ -70,10 +71,10 @@ function MisSolicitudes() {
       });
   };
 
-  function modificarReserva(dataRow, e){
+  function modificarReserva(dataRow, e) {
     const fechaEntrada = dataRow.fechaEntrada;
     const fechaSalida = dataRow.fechaSalida;
-    const idAnfitrion = dataRow.idAnfitrion 
+    const idAnfitrion = dataRow.idAnfitrion;
     const idAlojamiento = dataRow.idAlojamiento;
     const idHuesped = dataRow.idHuesped;
     const tituloAlojamiento = dataRow.tituloAlojamiento;
@@ -85,20 +86,22 @@ function MisSolicitudes() {
       idHuesped,
       idAlojamiento,
       tituloAlojamiento,
-      estado
+      estado,
     };
-    fetch("http://localhost:8081/api/reservas/" + dataRow.id, {
+    fetch(ruta + "/api/reservas/" + dataRow.id, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(reservaModificada),
     }).then(() => {
+      window.location.reload();
     });
-  };
+  }
 
   function borrarReserva(id) {
-    const rutaBorrar = `${"http://localhost:8081/api/reservas/" + id}`;
+    const rutaBorrar = `${ruta + "/api/reservas/" + id}`;
     console.log(rutaBorrar);
     fetch(rutaBorrar, { method: "DELETE" });
+    window.location.reload();
   }
 
   useEffect(() => {
@@ -125,37 +128,52 @@ function MisSolicitudes() {
         Solicitudes enviadas
       </Typography>
       <TableContainer component={Paper}>
-        <Table sx={{ minWidth: 650 }} aria-label="simple table">
-          <TableHead>
-            <TableRow>
-              <TableCell>Título</TableCell>
-              <TableCell align="left"></TableCell>
-              <TableCell align="left">Fecha Entrada</TableCell>
-              <TableCell align="left">Fecha Salida</TableCell>
-              <TableCell align="left">Estado</TableCell>
-            
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {data.map((row) => (
-              <TableRow
-                key={row.id}
-                sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
-              >
-                <TableCell component="th" scope="row">
-                  {row.tituloAlojamiento}
-                </TableCell>
-                <TableCell align="left">
-                  <Button onClick={() => verAlojamiento(row.idAlojamiento)} variant="contained">Ver alojamiento</Button>
-                </TableCell>
-                <TableCell align="left">{row.fechaEntrada}</TableCell>
-                <TableCell align="left">{row.fechaSalida}</TableCell>
-                <TableCell align="left">{row.estado[0].toUpperCase() + row.estado.slice(1)}</TableCell>
-
+        {data.length === 0 || data === undefined ? (
+          <Typography
+            variant="h5"
+            sx={{ margin: 3, fontWeight: 700, color: "gray" }}
+          >
+            {" "}
+            No tienes solicitudes enviadas. 😔{" "}
+          </Typography>
+        ) : (
+          <Table sx={{ minWidth: 650 }} aria-label="simple table">
+            <TableHead>
+              <TableRow>
+                <TableCell>Título</TableCell>
+                <TableCell align="left"></TableCell>
+                <TableCell align="left">Fecha Entrada</TableCell>
+                <TableCell align="left">Fecha Salida</TableCell>
+                <TableCell align="left">Estado</TableCell>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+            </TableHead>
+            <TableBody>
+              {data.map((row) => (
+                <TableRow
+                  key={row.id}
+                  sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
+                >
+                  <TableCell component="th" scope="row">
+                    {row.tituloAlojamiento}
+                  </TableCell>
+                  <TableCell align="left">
+                    <Button
+                      onClick={() => verAlojamiento(row.idAlojamiento)}
+                      variant="contained"
+                    >
+                      Ver alojamiento
+                    </Button>
+                  </TableCell>
+                  <TableCell align="left">{row.fechaEntrada}</TableCell>
+                  <TableCell align="left">{row.fechaSalida}</TableCell>
+                  <TableCell align="left">
+                    {row.estado[0].toUpperCase() + row.estado.slice(1)}
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        )}
       </TableContainer>
       <Typography
         variant="h5"
@@ -174,44 +192,69 @@ function MisSolicitudes() {
         Solicitudes recibidas
       </Typography>
       <TableContainer component={Paper}>
-        <Table sx={{ minWidth: 650 }} aria-label="simple table">
-          <TableHead>
-            <TableRow>
-              <TableCell>Título</TableCell>
-              <TableCell align="left">Fecha Entrada</TableCell>
-              <TableCell align="left">Fecha Salida</TableCell>
-              <TableCell align="left"></TableCell>
-              <TableCell align="left"></TableCell>
-              <TableCell align="left"></TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {dataOwner.map((row) => (
-              <TableRow
-                key={row.id}
-                sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
-              >
-                <TableCell component="th" scope="row">{row.tituloAlojamiento}</TableCell>
-                <TableCell align="left">{row.fechaEntrada}</TableCell>
-                <TableCell align="left">{row.fechaSalida}</TableCell>
-                <TableCell align="left">
-                  <Button onClick={() => verUsuario(row.idHuesped)}  variant="contained">Ver Usuario</Button>
-                </TableCell>
-                <TableCell align="left">
-                  <Button variant="contained" onClick={()=>modificarReserva(row,'aceptada')}>Aceptar Solicitud</Button>
-                </TableCell>
-                <TableCell align="left">
-                  <Button variant="contained" color="error" onClick={()=>borrarReserva(row.id)}>
-                    Denegar Solicitud
-                  </Button>
-                </TableCell>
+        {dataOwner.length === 0 || dataOwner === undefined ? (
+          <Typography
+            variant="h5"
+            sx={{ margin: 3, fontWeight: 700, color: "gray" }}
+          >
+            {" "}
+            No has recibido nuevas solicitudes. 😔{" "}
+          </Typography>
+        ) : (
+          <Table sx={{ minWidth: 650 }} aria-label="simple table">
+            <TableHead>
+              <TableRow>
+                <TableCell>Título</TableCell>
+                <TableCell align="left">Fecha Entrada</TableCell>
+                <TableCell align="left">Fecha Salida</TableCell>
+                <TableCell align="left"></TableCell>
+                <TableCell align="left"></TableCell>
+                <TableCell align="left"></TableCell>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+            </TableHead>
+            <TableBody>
+              {dataOwner.map((row) => (
+                <TableRow
+                  key={row.id}
+                  sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
+                >
+                  <TableCell component="th" scope="row">
+                    {row.tituloAlojamiento}
+                  </TableCell>
+                  <TableCell align="left">{row.fechaEntrada}</TableCell>
+                  <TableCell align="left">{row.fechaSalida}</TableCell>
+                  <TableCell align="left">
+                    <Button
+                      onClick={() => verUsuario(row.idHuesped)}
+                      variant="contained"
+                    >
+                      Ver usuario
+                    </Button>
+                  </TableCell>
+                  <TableCell align="left">
+                    <Button
+                      variant="contained"
+                      onClick={() => modificarReserva(row, "aceptada")}
+                    >
+                      Aceptar solicitud
+                    </Button>
+                  </TableCell>
+                  <TableCell align="left">
+                    <Button
+                      variant="contained"
+                      color="error"
+                      onClick={() => borrarReserva(row.id)}
+                    >
+                      Denegar solicitud
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        )}
       </TableContainer>
     </Container>
-    
   );
 }
 

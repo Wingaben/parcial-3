@@ -4,11 +4,9 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "postinstall": "npm rebuild node-sass && npm install --unsafe-perm -f node-sass",
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview",
-    "deploy": "gh-pages -d dist"
+    "preview": "vite preview"
   },
   "dependencies": {
     "@emotion/react": "^11.10.5",
@@ -27,7 +25,6 @@
     "dayjs": "^1.11.6",
     "esbuild": "^0.15.16",
     "gapi-script": "^1.2.0",
-    "gh-pages": "^4.0.0",
     "jwt-decode": "^3.1.2",
     "leaflet": "^1.9.2",
     "moment": "^2.29.4",
@@ -40,6 +37,7 @@
     "react-paypal-js": "^0.0.1-security",
     "react-router-dom": "^6.4.3",
     "react-share": "^4.4.1",
+    "react-swipeable-views": "^0.14.0",
     "react-swipeable-views-utils": "^0.14.0"
   },
   "devDependencies": {

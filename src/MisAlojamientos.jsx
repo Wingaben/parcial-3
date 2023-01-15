@@ -18,16 +18,17 @@ function MisAlojamientos() {
   const navigate = useNavigate();
   const { user, setUser } = useContext(UsuarioContext);
 
-  const ruta = `${
-    "http://localhost:8081/api/alojamientos?idAnfitrion=" + user.sub
-  }`;
+  var ruta =
+    import.meta.env.MODE === "development"
+      ? import.meta.env.VITE_LOCALHOST_URL
+      : import.meta.env.VITE_LANDBNB_URL;
 
   function verAlojamiento(id) {
     navigate("/VerAlojamiento/" + id);
   }
 
   const getData = () => {
-    fetch(ruta, {
+    fetch(ruta + "/api/alojamientos?idAnfitrion=" + user.sub, {
       headers: {
         "Content-Type": "application/json",
         Accept: "application/json",
@@ -38,7 +39,6 @@ function MisAlojamientos() {
         return response.json();
       })
       .then(function (myJson) {
-        console.log(myJson);
         setData(myJson);
       });
   };
@@ -48,7 +48,7 @@ function MisAlojamientos() {
   }, []);
 
   function borrarAlojamiento(id) {
-    const rutaBorrar = `${"http://localhost:8081/api/alojamientos/" + id}`;
+    const rutaBorrar = `${ruta + "/api/alojamientos/" + id}`;
     console.log(rutaBorrar);
     fetch(rutaBorrar, { method: "DELETE" }).then(window.location.reload(false));
   }
@@ -79,50 +79,77 @@ function MisAlojamientos() {
       </Typography>
 
       <TableContainer component={Paper}>
-        <Table sx={{ minWidth: 650 }} aria-label="simple table">
-          <TableHead>
-            <TableRow>
-              <TableCell>Título</TableCell>
-              <TableCell align="left">Dirección</TableCell>
-              <TableCell align="left">Dirección Llaves</TableCell>
-              <TableCell align="left">Precio</TableCell>
-              <TableCell align="left"></TableCell>
-              <TableCell align="left"></TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {data.map((row) => (
-              <TableRow
-                key={row.id}
-                sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
-              >
-                <TableCell component="th" scope="row" onClick={() => verAlojamiento(row.id)}>
-                  {row.titulo}
-                </TableCell>
-                <TableCell align="left">{row.direccion}</TableCell>
-                <TableCell align="left">{row.direccionLlaves}</TableCell>
-                <TableCell align="left">{row.precio}</TableCell>
-                <TableCell align="left">
-                  <Button
-                    variant="contained"
-                    onClick={() => modificarAlojamiento(row.id)}
-                  >
-                    Modificar
-                  </Button>
-                </TableCell>
-                <TableCell align="left">
-                  <Button
-                    variant="contained"
-                    color="error"
-                    onClick={() => borrarAlojamiento(row.id)}
-                  >
-                    Borrar
-                  </Button>
-                </TableCell>
+        {data.length === 0 || data === undefined ? (
+          <Box sx={{ display: "flex" }}>
+            <Typography
+              variant="h5"
+              sx={{ margin: 3, fontWeight: 700, color: "gray" }}
+            >
+              {" "}
+              Aún no tienes alojamientos creados 😔{" "}
+            </Typography>
+            <Button
+              variant="contained"
+              type="submit"
+              sx={{ paddingTop: "10px", margin: "auto" }}
+              onClick={() => {
+                navigate("/CrearAlojamiento");
+              }}
+            >
+              Crear alojamiento
+            </Button>
+          </Box>
+        ) : (
+          <Table sx={{ minWidth: 650 }} aria-label="simple table">
+            <TableHead>
+              <TableRow>
+                <TableCell>Título</TableCell>
+                <TableCell align="left">Dirección</TableCell>
+                <TableCell align="left">Dirección Llaves</TableCell>
+                <TableCell align="left">Precio</TableCell>
+                <TableCell align="left"></TableCell>
+                <TableCell align="left"></TableCell>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+            </TableHead>
+            <TableBody>
+              {data.map((row) => (
+                <TableRow
+                  key={row.id}
+                  sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
+                >
+                  <TableCell
+                    component="th"
+                    scope="row"
+                    style={{ cursor: "pointer" }}
+                    onClick={() => verAlojamiento(row.id)}
+                  >
+                    {row.titulo} 🔍
+                  </TableCell>
+                  <TableCell align="left">{row.direccion}</TableCell>
+                  <TableCell align="left">{row.direccionLlaves}</TableCell>
+                  <TableCell align="left">{row.precio}</TableCell>
+                  <TableCell align="left">
+                    <Button
+                      variant="contained"
+                      onClick={() => modificarAlojamiento(row.id)}
+                    >
+                      Modificar
+                    </Button>
+                  </TableCell>
+                  <TableCell align="left">
+                    <Button
+                      variant="contained"
+                      color="error"
+                      onClick={() => borrarAlojamiento(row.id)}
+                    >
+                      Borrar
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        )}
       </TableContainer>
     </Container>
   );

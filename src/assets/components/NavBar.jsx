@@ -2,7 +2,6 @@ import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
 import Toolbar from "@mui/material/Toolbar";
 import IconButton from "@mui/material/IconButton";
-import Button from "@mui/material/Button"
 import Typography from "@mui/material/Typography";
 import Menu from "@mui/material/Menu";
 import Container from "@mui/material/Container";
@@ -10,6 +9,7 @@ import Avatar from "@mui/material/Avatar";
 import MenuItem from "@mui/material/MenuItem";
 import React, { useContext, useState } from "react";
 import "../css/navBar.css";
+import logo from "../img/logo.svg";
 import { SvgIcon } from "@mui/material";
 import { googleLogout } from "@react-oauth/google";
 import { BrowserRouter as Router, Route, Routes, Link } from "react-router-dom";
@@ -20,19 +20,21 @@ import jwt_decode from "jwt-decode";
 function NavBar() {
   const [anchorElUser, setAnchorElUser] = React.useState(null);
   const { user, setUser } = useContext(UsuarioContext);
-  const [id, setId] = useState(0);
-  const [timestamp, setTimestamp] = useState(0);
-  const [email, setEmail] = useState(0);
+
+  var ruta =
+    import.meta.env.MODE === "development"
+      ? import.meta.env.VITE_LOCALHOST_URL
+      : import.meta.env.VITE_LANDBNB_URL;
+
   const handleOpenUserMenu = (event) => {
     setAnchorElUser(event.currentTarget);
-
   };
+
   const handleCloseUserMenu = () => {
     setAnchorElUser(null);
   };
+
   const registrarUsuario = (decode) => {
-    setId(decode.sub);
-    setEmail(decode.email);
     const id = decode.sub;
     const email = decode.email;
     const nombre = decode.given_name;
@@ -43,17 +45,21 @@ function NavBar() {
       nombre,
       apellidos,
     };
-    fetch("http://localhost:8081/api/usuarios", {
+
+    fetch(ruta + "/api/usuarios", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(usuario),
     });
   };
+
   return (
     <AppBar position="static">
       <Container maxWidth="xxl">
         <Toolbar disableGutters>
-
+          <SvgIcon sx={{ display: { xs: "none", md: "flex" }, mr: 1 }}>
+            <img src={logo} alt="Logo" />
+          </SvgIcon>
           <Link to="/" style={{ textDecoration: "none" }}>
             <Typography
               variant="h6"
@@ -64,9 +70,13 @@ function NavBar() {
                 color: "white",
               }}
             >
-              EMTInfo
+              LANDBNB
             </Typography>
           </Link>
+
+          <SvgIcon sx={{ display: { xs: "none", md: "flex" }, mr: 1 }}>
+            <img src={logo} alt="Logo" />
+          </SvgIcon>
           <Typography
             variant="h5"
             noWrap
@@ -83,7 +93,7 @@ function NavBar() {
               textDecoration: "none",
             }}
           >
-            EMTInfo
+            LANDBNB
           </Typography>
           <Box sx={{ flexGrow: 1, display: { xs: "none", md: "flex" } }}></Box>
           <Box sx={{ flexGrow: 0 }}>
@@ -106,8 +116,7 @@ function NavBar() {
                   var decoded = jwt_decode(credentialResponse.credential);
                   setUser(decoded);
                   registrarUsuario(decoded);
-                  console.log(decoded);
-                  sessionStorage.setItem("authSub", JSON.stringify(decoded))
+                  sessionStorage.setItem("authSub", JSON.stringify(decoded));
                 }}
                 onError={() => {
                   console.log("Login Failed");
@@ -131,10 +140,62 @@ function NavBar() {
               open={Boolean(anchorElUser)}
               onClose={handleCloseUserMenu}
             >
-              <MenuItem onClick={() => {
-                sessionStorage.clear();
-                googleLogout()
-              }} component="a" href="/">
+              <MenuItem
+                component={Link}
+                to="/MiPerfil"
+                onClick={() => handleCloseUserMenu()}
+              >
+                <Typography textAlign="center">Mi perfil</Typography>
+              </MenuItem>
+
+              <MenuItem
+                component={Link}
+                to="/MisMensajes"
+                onClick={() => handleCloseUserMenu()}
+              >
+                <Typography textAlign="center">Mis mensajes</Typography>
+              </MenuItem>
+
+              <MenuItem
+                component={Link}
+                to="/CrearAlojamiento"
+                onClick={() => handleCloseUserMenu()}
+              >
+                <Typography textAlign="center">Añadir alojamiento</Typography>
+              </MenuItem>
+
+              <MenuItem
+                component={Link}
+                to="/MisAlojamientos"
+                onClick={() => handleCloseUserMenu()}
+              >
+                <Typography textAlign="center">Mis alojamientos</Typography>
+              </MenuItem>
+
+              <MenuItem
+                component={Link}
+                to="/MisReservas"
+                onClick={() => handleCloseUserMenu()}
+              >
+                <Typography textAlign="center">Mis reservas</Typography>
+              </MenuItem>
+
+              <MenuItem
+                component={Link}
+                to="/MisSolicitudes"
+                onClick={() => handleCloseUserMenu()}
+              >
+                <Typography textAlign="center">Mis solicitudes</Typography>
+              </MenuItem>
+
+              <MenuItem
+                onClick={() => {
+                  sessionStorage.clear();
+                  googleLogout();
+                }}
+                component="a"
+                href="/"
+              >
                 <Typography textAlign="center">Cerrar sesión</Typography>
               </MenuItem>
             </Menu>

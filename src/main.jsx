@@ -9,11 +9,11 @@ import "dayjs/locale/es";
 import AppRouter from "./AppRouter";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
-  <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="es">
-    <GoogleOAuthProvider clientId="567698319957-53nqtfjjlte816g3rhm3sqaa425e2o5s.apps.googleusercontent.com">
-      <ThemeProvider theme={tema}>
-        <AppRouter />
-      </ThemeProvider>
-    </GoogleOAuthProvider>
-  </LocalizationProvider>
+    <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="es">
+      <GoogleOAuthProvider clientId="567698319957-53nqtfjjlte816g3rhm3sqaa425e2o5s.apps.googleusercontent.com">
+        <ThemeProvider theme={tema}>
+          <AppRouter />
+        </ThemeProvider>
+      </GoogleOAuthProvider>
+    </LocalizationProvider>
 );

@@ -1,8 +1,16 @@
-import { Typography, Container, Grid, Rating, TextField, Avatar } from "@mui/material";
+import {
+  Typography,
+  Container,
+  Grid,
+  Rating,
+  TextField,
+  Avatar,
+} from "@mui/material";
 import { Box } from "@mui/system";
 import React, { useState, useEffect, useContext } from "react";
 import { Image } from "mui-image";
 import Link from "@mui/material/Link";
+import Stack from "@mui/material/Stack";
 import DirectionsIcon from "@mui/icons-material/Directions";
 import Badge from "@mui/material/Badge";
 import PhotoLibraryIcon from "@mui/icons-material/PhotoLibrary";
@@ -11,45 +19,22 @@ import Button from "@mui/material/Button";
 import { useParams } from "react-router-dom";
 import GroupIcon from "@mui/icons-material/Group";
 import { UsuarioContext } from "./UsuarioContext";
-import AirplanemodeActiveIcon from '@mui/icons-material/AirplanemodeActive';
-import EditIcon from '@mui/icons-material/Edit';
-import SaveAltIcon from '@mui/icons-material/SaveAlt';
+import AirplanemodeActiveIcon from "@mui/icons-material/AirplanemodeActive";
+import EditIcon from "@mui/icons-material/Edit";
+import SaveAltIcon from "@mui/icons-material/SaveAlt";
+import Divider from "@mui/material/Divider";
 import {
-  EmailShareButton,
   FacebookShareButton,
-  HatenaShareButton,
-  InstapaperShareButton,
-  LineShareButton,
-  LinkedinShareButton,
-  LivejournalShareButton,
-  MailruShareButton,
-  OKShareButton,
-  PinterestShareButton,
-  PocketShareButton,
-  RedditShareButton,
-  TelegramShareButton,
-  TumblrShareButton,
   TwitterShareButton,
-  ViberShareButton,
-  VKShareButton,
   WhatsappShareButton,
-  WorkplaceShareButton
 } from "react-share";
-import Messenger from "./assets/components/Messenger/Messenger"
-
 import "leaflet/dist/leaflet.css";
-import {
-  MapContainer,
-  TileLayer,
-  Marker,
-  Popup,
-  useMapEvents,
-} from "react-leaflet";
+import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
+
 function VerAlojamiento() {
   const match = { params: useParams() };
-  let { idAlojamientoParam } = useParams();
+  let { idAlojamientoParam } = useParams(); 
 
-  
   const [data, setData] = useState({});
   const [resenas, setResenas] = useState({});
   const [aeropuerto, setAeropuerto] = useState("");
@@ -64,17 +49,21 @@ function VerAlojamiento() {
   const idAlojamiento = /[^/]*$/.exec(url)[0];
   //se supone que ha de hacerse con this.props.match.params.id pero me da muchos errores, aquí lo hago simplemente sacándolo de la URL
 
-  const rutaApi =
-    `${"http://localhost:8081/api/alojamientos/"}` + idAlojamiento;
+  var ruta =
+    import.meta.env.MODE === "development"
+      ? import.meta.env.VITE_LOCALHOST_URL
+      : import.meta.env.VITE_LANDBNB_URL;
 
-  const rutaResenas = `${"http://localhost:8081/api/resena/"}` + idAlojamiento;
+  const rutaApi = `${ruta + "/api/alojamientos/"}` + idAlojamiento;
+
+  const rutaResenas = `${ruta + "/api/resena/"}` + idAlojamiento;
 
   let navigate = useNavigate();
   const routeChange = () => {
     if (user === null) {
       event.preventDefault();
       alert("Por favor, inicia sesión para realizar una reserva.");
-    } else if(user.sub == data.idAnfitrion) {
+    } else if (user.sub == data.idAnfitrion) {
       event.preventDefault();
       alert("No puedes reservar tu propio alojamiento!");
     } else {
@@ -87,7 +76,7 @@ function VerAlojamiento() {
     navigate("/VerPerfil/" + id);
   }
 
-  function getData () {
+  function getData() {
     fetch(rutaApi, {
       headers: {
         "Content-Type": "application/json",
@@ -100,37 +89,43 @@ function VerAlojamiento() {
       .then(function (myJson) {
         setData(myJson);
         setArrayFotos(myJson.fotos);
-        rutaOpenData = `${"http://localhost:8082/api/airports?longitude=" + myJson.longitud + "&latitude=" + myJson.latitud + "&radius=50"}`
-        console.log(rutaOpenData);
-
-        return fetch(rutaOpenData, {
+        ruta = `${
+          ruta +
+          "/api/alojamientos/airports?longitude=" +
+          myJson.longitud +
+          "&latitude=" +
+          myJson.latitud +
+          "&radius=50"
+        }`;
+        return fetch(ruta, {
           headers: {
             "Content-Type": "application/json",
             Accept: "application/json",
-          }
-      })
-      .then(function (respuesta) {
-        return respuesta.json();
-      })
-      .then(function (miAeropuerto) {
-        if(miAeropuerto.length>0){
-          setAeropuerto(miAeropuerto[0].nombre);
+          },
+        })
+          .then(function (respuesta) {
+            return respuesta.json();
+          })
+          .then(function (miAeropuerto) {
+            if (miAeropuerto.length > 0) {
+              setAeropuerto(miAeropuerto[0].nombre);
 
-          return fetch(rutaResenas, {
-            headers: {
-              "Content-Type": "application/json",
-              Accept: "application/json",
+              return fetch(rutaResenas, {
+                headers: {
+                  "Content-Type": "application/json",
+                  Accept: "application/json",
+                },
+              })
+                .then(function (answer) {
+                  return answer.json();
+                })
+                .then(function (misResenas) {
+                  setResenas(misResenas);
+                  console.log(misResenas);
+                  setLoaded(true);
+                });
             }
-          }).then(function(answer) {
-            return answer.json();
-          }).then(function(misResenas){
-              setResenas(misResenas);
-              console.log(misResenas);
-              setLoaded(true);
-              console.log('hey'+user.sub)
           });
-        }
-      })
       });
   }
 
@@ -143,37 +138,45 @@ function VerAlojamiento() {
   const [textoInput, setTextoInput] = useState("");
   const [valoracionInput, setValoracionInput] = useState(0);
 
-  function modificarResena(idResena, idHuesped, fotoHuesped) {
+  function modificarSet(res) {
+    setEditClicked(!editClicked);
+    setTituloInput(res.titulo);
+    setTextoInput(res.texto);
+    setValoracionInput(res.valoracion);
+  }
 
+  function reloadPage() {
+    window.location.reload();
+  }
 
-    const idAlojamientoResena = idAlojamiento;
+  function borrarResena(idResena) {
+    fetch(ruta + "/api/resena/" + idResena, { method: "DELETE" }).then(
+      reloadPage()
+    );
+  }
+
+  function modificarResena(idResena, idHuesped, fotoHuespedInput) {
     const idHuespedResena = idHuesped;
-    const tituloResena = tituloInput;
-    const textoResena = textoInput;
-    const valoracionResena = valoracionInput;
-    const fotoHuespedResena = fotoHuesped; 
+    const titulo = tituloInput;
+    const texto = textoInput;
+    const fotoHuesped = fotoHuespedInput;
+    const valoracion = valoracionInput;
 
-    console.log('heyyyy')
-    console.log('idresena'+ idResena)
-    console.log(idAlojamientoResena)
-    console.log(idHuespedResena)
-    console.log(tituloResena)
-    console.log(fotoHuespedResena)
-
-    const resena = {
-      idAlojamientoResena,
-      idHuespedResena,
-      tituloResena,
-      textoResena,
-      fotoHuespedResena,
-      valoracionResena
+    const resenaModificada = {
+      idAlojamiento,
+      idHuesped,
+      titulo,
+      texto,
+      fotoHuesped,
+      valoracion,
     };
 
-    fetch("http://localhost:8081/api/resena/" + idResena, {
+    fetch(ruta + "/api/resena/" + idResena, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(resena),
+      body: JSON.stringify(resenaModificada),
     }).then(() => {
+      reloadPage();
     });
   }
 
@@ -186,7 +189,7 @@ function VerAlojamiento() {
             borderRadius: 3,
           }}
           p={3}
-          elevation={10} 
+          elevation={10}
         >
           <Grid
             container
@@ -194,7 +197,6 @@ function VerAlojamiento() {
             justifyContent="flex-start"
             alignItems="flex-start"
             spacing={2}
-            
           >
             <Grid item xs={12}>
               <Box>
@@ -205,9 +207,9 @@ function VerAlojamiento() {
                 >
                   {data.titulo}
                 </Typography>
-                
+
+                <Rating value={data.valoracionAlojamiento} readOnly />
               </Box>
-              
             </Grid>
             <Grid item xs={12}>
               <Box
@@ -224,7 +226,6 @@ function VerAlojamiento() {
                   style={{ paddingTop: 10, borderRadius: 16 }}
                   src={arrayFotos[picSelector].url}
                   showLoading
-                  
                 />
 
                 <Badge color="secondary" badgeContent={arrayFotos.length}>
@@ -238,9 +239,8 @@ function VerAlojamiento() {
                       }
                     }}
                   />
-                  
                 </Badge>
-                
+
                 <Box
                   sx={{
                     display: "flex",
@@ -268,31 +268,54 @@ function VerAlojamiento() {
                     <Link
                       onClick={() => verUsuario(data.idAnfitrion)}
                       underline="hover"
-                      style={{ fontWeight: 700 }}
+                      style={{
+                        fontWeight: 700,
+                        width: "inherit",
+                        cursor: "pointer",
+                      }}
                     >
                       {data.nombreAnfitrion}
                     </Link>
-                    <Rating value={4} readOnly style={{ marginLeft: "20px" }} />
-                    
-                    <TwitterShareButton url={url} title={'¡Mira este alojamiento que he visto en LandBnb!'}>
-                      <button className="btn btn-circle">
+
+                    <Box
+                      sx={{
+                        display: "flex",
+                        justifyContent: "end",
+                      }}
+                    >
+                      <TwitterShareButton
+                        url={url}
+                        title={
+                          "¡Mira este alojamiento que he visto en LandBnb!"
+                        }
+                      >
+                        <button className="btn btn-circle">
                           <i className="fab fa-twitter"> </i>
-                      </button>
-                    </TwitterShareButton>
-                    
-                    <WhatsappShareButton  url={url} title={'¡Mira este alojamiento que he visto en LandBnb!'}>
-                    <button className="btn btn-circle">
+                        </button>
+                      </TwitterShareButton>
+
+                      <WhatsappShareButton
+                        url={url}
+                        title={
+                          "¡Mira este alojamiento que he visto en LandBnb!"
+                        }
+                      >
+                        <button className="btn btn-circle">
                           <i className="fab fa-whatsapp"> </i>
-                      </button>
-                    </WhatsappShareButton>
+                        </button>
+                      </WhatsappShareButton>
 
-                    <FacebookShareButton url={url} quote={'¡Mira este alojamiento que he visto en LandBnb!'}>
-                    <button className="btn btn-circle">
+                      <FacebookShareButton
+                        url={url}
+                        quote={
+                          "¡Mira este alojamiento que he visto en LandBnb!"
+                        }
+                      >
+                        <button className="btn btn-circle">
                           <i className="fab fa-facebook"> </i>
-                      </button>
-
-                    </FacebookShareButton>
-                    
+                        </button>
+                      </FacebookShareButton>
+                    </Box>
                   </Box>
 
                   <Box
@@ -337,29 +360,33 @@ function VerAlojamiento() {
                     >
                       {" "}
                       <DirectionsIcon style={{ marginRight: "10px" }} />
-                      {data.direccion}{","} {data.city}{","} {data.town} {data.state}
+                      {data.direccion}
+                      {","} {data.city}
+                      {","} {data.town} {data.state}
                       {" - "}
                       {data.country}
                     </Typography>
                   </Box>
-                  { aeropuerto ? (
+                  {aeropuerto ? (
                     <Box
-                    sx={{
-                      display: "flex",
-                      alignItems: "center",
-                      paddingTop: 2,
-                      width: "100%",
-                    }}
-                  >
-                    <Typography
-                      variant="h6"
-                      sx={{ paddingLeft: 3, paddingRight: 2 }}
+                      sx={{
+                        display: "flex",
+                        alignItems: "center",
+                        paddingTop: 2,
+                        width: "100%",
+                      }}
                     >
-                      {" "}
-                      <AirplanemodeActiveIcon style={{ marginRight: "10px" }} />
-                      {aeropuerto}
-                    </Typography>
-                  </Box>
+                      <Typography
+                        variant="h6"
+                        sx={{ paddingLeft: 3, paddingRight: 2 }}
+                      >
+                        {" "}
+                        <AirplanemodeActiveIcon
+                          style={{ marginRight: "10px" }}
+                        />
+                        {aeropuerto}
+                      </Typography>
+                    </Box>
                   ) : (
                     <div></div>
                   )}
@@ -434,57 +461,140 @@ function VerAlojamiento() {
                   <Box sx={{ height: "50%" }}></Box>
                 </MapContainer>
               </Box>
-              
             </Grid>
-            <Messenger id='101849880438349715423'>      
-            </Messenger>
           </Grid>
+          <Divider variant="middle" style={{ marginTop: "20px" }} />
           <Box>
             <Typography
               variant="h5"
               color={"primary"}
-              style={{ fontWeight: 700 }}
+              style={{ fontWeight: 700, marginTop: "20px" }}
             >
               Reseñas de este alojamiento
             </Typography>
           </Box>
-          <Box>
-            {resenas.map((r) => (
-              <Box
-              sx={{
-                background: "linear-gradient(90deg, rgba(255,255,255,1) 0%, rgba(255,255,255,1) 100%)",
-                borderRadius: 0,
-                padding: 1,
-                marginBottom: 1,
-              }}
-              p={3}
-              elevation={10}
+          {resenas.length === 0 || resenas === undefined ? (
+            <Typography
+              variant="h5"
+              sx={{ margin: 3, fontWeight: 700, color: "gray" }}
             >
-              <Avatar src={r.fotoHuesped}/>
-              {(user.sub==r.idHuesped && editClicked)?<Rating value={r.valoracion} />:<Rating readOnly value={r.valoracion} />} 
-              {
-                (user.sub==r.idHuesped && editClicked)?
-                <TextField id="input-with-sx" label="titulo" placeholder={r.titulo} variant="standard" 
-                onChange={(newValue) => setTituloInput(newValue.target.value)} value={tituloInput} />
-                :
-                <Typography sx={{fontWeight: 'Bold'}}>{r.titulo}</Typography>
-                  
-              }
+              {" "}
+              Aún no hay reseñas para este alojamiento.{" "}
+            </Typography>
+          ) : (
+            <Box>
+              {resenas.map((r) => (
+                <Box
+                  sx={{
+                    background: "white",
+                    borderRadius: 1.5,
+                    padding: 2,
+                    marginBottom: 1,
+                    marginTop: 1,
+                  }}
+                >
+                  <Box
+                    style={{
+                      width: "100%",
+                      display: "flex",
+                      alignItems: "center",
+                    }}
+                  >
+                    <Avatar
+                      onClick={() => {
+                        verUsuario(r.idHuesped);
+                      }}
+                      style={{ cursor: "pointer" }}
+                      src={r.fotoHuesped}
+                    />
+                    <Typography sx={{ fontWeight: "Bold", marginLeft: "10px" }}>
+                      {r.nombreHuesped}
+                    </Typography>
+                  </Box>
 
-              {
-                (user.sub==r.idHuesped && editClicked)?
-                <TextField id="input-with-sx" label="texto" placeholder={r.texto} variant="standard" 
-                onChange={(newValue) => setTextoInput(newValue.target.value)} value={textoInput} />
-                :
-                <Typography >{r.texto}</Typography>
-                  
-              }
-              {user.sub==r.idHuesped && (<EditIcon style={{ cursor: "pointer" }} onClick={() => { setEditClicked(!editClicked) }}></EditIcon>)}
-              {(editClicked && user.sub==r.idHuesped ) && (<SaveAltIcon style={{ cursor: "pointer" }} onClick={() => { modificarResena(r.id, r.idHuesped, r.fotoHuesped) }}></SaveAltIcon>)}
-              </Box>
-              )
-            )}
-          </Box>
+                  {user !== null && user.sub == r.idHuesped && editClicked ? (
+                    <Rating
+                      onChange={(newValue) =>
+                        setValoracionInput(Number(newValue.target.value))
+                      }
+                      value={valoracionInput}
+                      required
+                    />
+                  ) : (
+                    <Rating readOnly value={r.valoracion} />
+                  )}
+                  {user !== null && user.sub == r.idHuesped && !editClicked && (
+                    <EditIcon
+                      style={{ cursor: "pointer" }}
+                      onClick={() => {
+                        modificarSet(r);
+                      }}
+                    ></EditIcon>
+                  )}
+                  <Stack sx={{ width: "100%" }}>
+                    {user !== null && user.sub == r.idHuesped && editClicked ? (
+                      <TextField
+                        label="Título"
+                        placeholder={r.titulo}
+                        variant="outlined"
+                        onChange={(newValue) =>
+                          setTituloInput(newValue.target.value)
+                        }
+                        value={tituloInput}
+                        style={{ marginTop: "10px", width: "50%" }}
+                      />
+                    ) : (
+                      <Typography sx={{ fontWeight: "Bold" }}>
+                        {r.titulo}
+                      </Typography>
+                    )}
+                  </Stack>
+                  <Stack>
+                    {user !== null && user.sub == r.idHuesped && editClicked ? (
+                      <TextField
+                        label="Comentario"
+                        placeholder={r.texto}
+                        v
+                        onChange={(newValue) =>
+                          setTextoInput(newValue.target.value)
+                        }
+                        value={textoInput}
+                        style={{ marginTop: "10px", width: "50%" }}
+                      />
+                    ) : (
+                      <Typography>{r.texto}</Typography>
+                    )}
+                  </Stack>
+                  <Box>
+                    {editClicked &&
+                      user !== null &&
+                      user.sub == r.idHuesped && (
+                        <Button
+                          variant="contained"
+                          color="error"
+                          onClick={() => borrarResena(r.id)}
+                        >
+                          {" "}
+                          Borrar reseña{" "}
+                        </Button>
+                      )}
+                    {editClicked &&
+                      user !== null &&
+                      user.sub == r.idHuesped && (
+                        <Button
+                          variant="contained"
+                          onClick={() => {
+                            modificarResena(r.id, r.idHuesped, r.fotoHuesped);
+                          }}
+                        >
+                          Guardar
+                        </Button>
+                      )}
+                  </Box>
+                </Box>
+              ))}
+            </Box>
+          )}
         </Box>
       )}
     </Container>

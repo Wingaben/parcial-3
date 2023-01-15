@@ -19,7 +19,7 @@ import Grid from "@mui/material/Grid";
 import InputAdornment from "@mui/material/InputAdornment";
 import Input from "@mui/material/Input";
 import LoadingButton from "@mui/lab/LoadingButton";
-import ImageIcon from '@mui/icons-material/Image';
+import ImageIcon from "@mui/icons-material/Image";
 import "leaflet/dist/leaflet.css";
 import {
   MapContainer,
@@ -31,7 +31,7 @@ import {
 import { useLocation } from "react-router-dom";
 import { UsuarioContext } from "./UsuarioContext";
 import { useNavigate } from "react-router-dom";
-import { ImageList, ImageListItem } from '@mui/material';
+import { ImageList, ImageListItem } from "@mui/material";
 
 // const [value, setValue] = React.useState<Dayjs | null>(dayjs('2022-04-07'));
 
@@ -41,9 +41,16 @@ function ModificarAlojamiento() {
   const { idalojamiento } = state;
   const { user, setUser } = useContext(UsuarioContext);
 
+  var ruta =
+    import.meta.env.MODE === "development"
+      ? import.meta.env.VITE_LOCALHOST_URL
+      : import.meta.env.VITE_LANDBNB_URL;
+
   const [descripcionInput, setdescripcionInput] = useState("");
   const [tituloInput, setTituloInput] = useState("");
   const [capacidades, setCapacidades] = useState(0);
+  const [valoracionAnfitrion, setValoracionAnfitrion] = useState(0);
+  const [valoracionAlojamiento, setValoracionAlojamiento] = useState(0);
   const [checkInInput, setCheckInInput] = useState(dayjs());
   const [checkOutInput, setCheckoutInput] = useState(dayjs());
   const [data, setData] = useState([]);
@@ -53,8 +60,8 @@ function ModificarAlojamiento() {
   const [position, setPosition] = useState([0, 0]);
 
   const [tabId, setTabId] = useState(0);
+  capacidades;
 
-  const [preMapLoc, setPreMapLoc] = useState(false);
   const [loading, setLoading] = useState(false);
   const [generalTab, setGeneralTab] = useState(true);
   const [precioTab, setPrecioTab] = useState(false);
@@ -71,10 +78,11 @@ function ModificarAlojamiento() {
   function uploadWidget() {
     var myWidget = window.cloudinary.openUploadWidget(
       {
-        cloud_name: 'dionckchd',
-        upload_preset: 'xmkbucid',
-        tags: ['miniflix'],
-        sources: ["local",
+        cloud_name: "dionckchd",
+        upload_preset: "xmkbucid",
+        tags: ["miniflix"],
+        sources: [
+          "local",
           "url",
           "camera",
           "image_search",
@@ -85,14 +93,18 @@ function ModificarAlojamiento() {
           "shutterstock",
           "getty",
           "istock",
-          "unsplash"]
-
+          "unsplash",
+        ],
       },
       (error, result) => {
         if (!error && result && result.event == "success") {
-          setImages((prev) => [...prev, { url: result.info.url, id: result.info.public_id }])
+          setImages((prev) => [
+            ...prev,
+            { url: result.info.url, id: result.info.public_id },
+          ]);
         }
-      });
+      }
+    );
     myWidget.open();
   }
 
@@ -113,7 +125,6 @@ function ModificarAlojamiento() {
     const longitud = position[1];
     const fotos = images;
     const idAnfitrion = user.sub;
-    const valoracionAnfitrion = 0;
     const nombreAnfitrion = user.name;
     const alojamiento = {
       capacidad,
@@ -129,10 +140,11 @@ function ModificarAlojamiento() {
       fotos,
       idAnfitrion,
       valoracionAnfitrion,
+      valoracionAlojamiento,
       nombreAnfitrion,
     };
 
-    fetch("http://localhost:8081/api/alojamientos/" + idalojamiento, {
+    fetch(ruta + "/api/alojamientos/" + idalojamiento, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(alojamiento),
@@ -143,12 +155,9 @@ function ModificarAlojamiento() {
     navigate("/MisAlojamientos");
   };
 
-  const rutaGet =
-    "http://localhost:8081/api/alojamientos/" + idalojamiento;
-
   const handleGetRequest = async () => {
     setGetLoading(false);
-    fetch(rutaGet, {
+    fetch(ruta + "/api/alojamientos/" + idalojamiento, {
       headers: {
         "Content-Type": "application/json",
         Accept: "application/json",
@@ -170,6 +179,8 @@ function ModificarAlojamiento() {
         setDireccionLlavesInput(myJson.direccionLlaves);
         setPosition([myJson.latitud, myJson.longitud]);
         setImages(myJson.fotos);
+        setValoracionAlojamiento(myJson.valoracionAlojamiento);
+        setValoracionAnfitrion(myJson.valoracionAnfitrion);
         // necessary to check the rest of them
         setGetLoading(true);
       });
@@ -197,312 +208,330 @@ function ModificarAlojamiento() {
     <>
       {getLoading && (
         <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale={"es"}>
-        <Container sx={{ backgroundColor: "" }}>
-          <Box paddingTop={5} paddingX={10}>
-            <Typography
-              variant="h5"
-              noWrap
-              color="primary"
-              sx={{
-                fontFamily: "monospace",
-                fontWeight: 700,
-                letterSpacing: ".15rem",
-              }}
-            >
-              MODIFICAR ALOJAMIENTO
-            </Typography>
-            <BottomNavigation
-              showLabels
-              value={tabId}
-              onChange={(event, newValue) => {
-                setTabId(newValue);
-                if (newValue === 0) {
-                  setDescriptionTab(false);
-                  setDireccionTab(false);
-                  setPrecioTab(false);
-                  setImagenesTab(false)
-                  setGeneralTab(true);
-                } else if (newValue === 1) {
-                  setDescriptionTab(false);
-                  setDireccionTab(false);
-                  setPrecioTab(true);
-                  setImagenesTab(false)
-                  setGeneralTab(false);
-                } else if (newValue === 2) {
-                  setDescriptionTab(false);
-                  setDireccionTab(true);
-                  setPrecioTab(false);
-                  setImagenesTab(false)
-                  setGeneralTab(false);
-                } else if (newValue === 3) {
-                  setDescriptionTab(false);
-                  setDireccionTab(false);
-                  setPrecioTab(false);
-                  setImagenesTab(true)
-                  setGeneralTab(false);
-                } else if (newValue === 4) {
-                  setDescriptionTab(true);
-                  setDireccionTab(false);
-                  setPrecioTab(false);
-                  setImagenesTab(false)
-                  setGeneralTab(false);
-                }
-              }}
-              sx={{ border: 1, justifyContent: "space-between" }}
-            >
-              <BottomNavigationAction label="General" icon={<HomeIcon />} />
-              <BottomNavigationAction label="Precio" icon={<EuroIcon />} />
-              <BottomNavigationAction
-                label="Direccion"
-                icon={<DirectionsIcon />}
-              />
-              <BottomNavigationAction label="Fotos" icon={<ImageIcon />} />
-              <BottomNavigationAction label="Resumen" icon={<InfoIcon />} />
-            </BottomNavigation>
-            {generalTab && (
-              <Box marginTop={2} border={1}>
-                <Stack spacing={2} padding={3}>
-                  <Box className="input">
-                    <Typography sx={{ marginLeft: "15px" }}>Título</Typography>
-  
-                    <TextField
-                      required
-                      id="filled-basic"
-                      variant="outlined"
-                      placeholder="Título del alojamiento"
-                      onChange={(newValue) =>
-                        setTituloInput(newValue.target.value)
-                      }
-                      value={tituloInput}
-                    />
-                  </Box>
-                  <Box className="input">
-                    <Typography sx={{ marginLeft: "15px" }}>
-                      Descripción
-                    </Typography>
-                    <TextField
-                      required
-                      id="filled-textarea-descripcion"
-                      placeholder="Servicios, restricciones..."
-                      multiline
-                      variant="outlined"
-                      onChange={(newValue) =>
-                        setdescripcionInput(newValue.target.value)
-                      }
-                      value={descripcionInput}
-                      InputProps={{
-                        startAdornment: (
-                          <InputAdornment position="start">
-                            <InfoIcon fontSize="15px" sx={{ pb: 2 }} />
-                          </InputAdornment>
-                        ),
-                      }}
-                    />
-                  </Box>
-  
-                  <Box>
-                    <Stack direction="row" className="input">
+          <Container sx={{ backgroundColor: "" }}>
+            <Box paddingTop={5} paddingX={10}>
+              <Typography
+                variant="h5"
+                noWrap
+                color="primary"
+                sx={{
+                  fontFamily: "monospace",
+                  fontWeight: 700,
+                  letterSpacing: ".15rem",
+                }}
+              >
+                MODIFICAR ALOJAMIENTO
+              </Typography>
+              <BottomNavigation
+                showLabels
+                value={tabId}
+                onChange={(event, newValue) => {
+                  setTabId(newValue);
+                  if (newValue === 0) {
+                    setDescriptionTab(false);
+                    setDireccionTab(false);
+                    setPrecioTab(false);
+                    setImagenesTab(false);
+                    setGeneralTab(true);
+                  } else if (newValue === 1) {
+                    setDescriptionTab(false);
+                    setDireccionTab(false);
+                    setPrecioTab(true);
+                    setImagenesTab(false);
+                    setGeneralTab(false);
+                  } else if (newValue === 2) {
+                    setDescriptionTab(false);
+                    setDireccionTab(true);
+                    setPrecioTab(false);
+                    setImagenesTab(false);
+                    setGeneralTab(false);
+                  } else if (newValue === 3) {
+                    setDescriptionTab(false);
+                    setDireccionTab(false);
+                    setPrecioTab(false);
+                    setImagenesTab(true);
+                    setGeneralTab(false);
+                  } else if (newValue === 4) {
+                    setDescriptionTab(true);
+                    setDireccionTab(false);
+                    setPrecioTab(false);
+                    setImagenesTab(false);
+                    setGeneralTab(false);
+                  }
+                }}
+                sx={{ border: 1, justifyContent: "space-between" }}
+              >
+                <BottomNavigationAction label="General" icon={<HomeIcon />} />
+                <BottomNavigationAction label="Precio" icon={<EuroIcon />} />
+                <BottomNavigationAction
+                  label="Direccion"
+                  icon={<DirectionsIcon />}
+                />
+                <BottomNavigationAction label="Fotos" icon={<ImageIcon />} />
+                <BottomNavigationAction label="Resumen" icon={<InfoIcon />} />
+              </BottomNavigation>
+              {generalTab && (
+                <Box marginTop={2} border={1}>
+                  <Stack spacing={2} padding={3}>
+                    <Box className="input">
+                      <Typography sx={{ marginLeft: "15px" }}>
+                        Título
+                      </Typography>
+
+                      <TextField
+                        required
+                        id="filled-basic"
+                        variant="outlined"
+                        placeholder="Título del alojamiento"
+                        onChange={(newValue) =>
+                          setTituloInput(newValue.target.value)
+                        }
+                        value={tituloInput}
+                      />
+                    </Box>
+                    <Box className="input">
+                      <Typography sx={{ marginLeft: "15px" }}>
+                        Descripción
+                      </Typography>
+                      <TextField
+                        required
+                        id="filled-textarea-descripcion"
+                        placeholder="Servicios, restricciones..."
+                        multiline
+                        variant="outlined"
+                        onChange={(newValue) =>
+                          setdescripcionInput(newValue.target.value)
+                        }
+                        value={descripcionInput}
+                        InputProps={{
+                          startAdornment: (
+                            <InputAdornment position="start">
+                              <InfoIcon fontSize="15px" sx={{ pb: 2 }} />
+                            </InputAdornment>
+                          ),
+                        }}
+                      />
+                    </Box>
+
+                    <Box>
+                      <Stack direction="row" className="input">
+                        <Box>
+                          <Typography sx={{ marginLeft: "15px" }}>
+                            Capacidad
+                          </Typography>
+                          <TextField
+                            required
+                            variant="outlined"
+                            size="small"
+                            inputProps={{ type: "number", min: 1 }}
+                            onChange={(newValue) =>
+                              setCapacidades(Number(newValue.target.value))
+                            }
+                            value={capacidades}
+                          />
+                        </Box>
+                        <Box>
+                          <Typography sx={{ marginLeft: "15px" }}>
+                            Check in
+                          </Typography>
+                          <TimePicker
+                            value={checkInInput}
+                            onChange={(newValue) => setCheckInInput(newValue)}
+                            renderInput={(params) => <TextField {...params} />}
+                          />
+                        </Box>
+                        <Box>
+                          <Typography sx={{ marginLeft: "15px" }}>
+                            Check out
+                          </Typography>
+                          <TimePicker
+                            value={checkOutInput}
+                            onChange={(newValue) => {
+                              setCheckoutInput(newValue);
+                            }}
+                            renderInput={(params) => <TextField {...params} />}
+                          />
+                        </Box>
+                      </Stack>
+                    </Box>
+                  </Stack>
+                </Box>
+              )}
+              {precioTab && (
+                <Box marginTop={2} border={1}>
+                  <Grid
+                    container
+                    direction="row"
+                    justifyContent="flex-start"
+                    alignItems="center"
+                    padding={2}
+                  >
+                    <Grid item xs={4}>
                       <Box>
+                        <InputLabel
+                          htmlFor="input-precio-noche"
+                          sx={{ pr: 10 }}
+                        >
+                          Precio por noche
+                        </InputLabel>
+                        <Input
+                          id="input-precio-noche"
+                          type="number"
+                          onChange={(newValue) =>
+                            setPrecioNoche(Number(newValue.target.value))
+                          }
+                          value={precioNoche}
+                          startAdornment={
+                            <InputAdornment position="start">
+                              <EuroIcon />
+                            </InputAdornment>
+                          }
+                        />
+                      </Box>
+                    </Grid>
+                  </Grid>
+                </Box>
+              )}
+              {direccionTab && (
+                <Box marginTop={2} border={1}>
+                  <Box p={2}>
+                    <Stack spacing={0} padding={0}>
+                      <Box className="input">
                         <Typography sx={{ marginLeft: "15px" }}>
-                          Capacidad
+                          Dirección del alojamiento
                         </Typography>
                         <TextField
-                          required
+                          id="filled-textarea-direccion"
+                          placeholder="Dirección del alojamiento"
+                          multiline
                           variant="outlined"
-                          size="small"
-                          inputProps={{ type: "number", min: 1 }}
+                          fullWidth
                           onChange={(newValue) =>
-                            setCapacidades(Number(newValue.target.value))
+                            setDireccionInput(newValue.target.value)
                           }
-                          value={capacidades}
-                        />
-                      </Box>
-                      <Box>
-                        <Typography sx={{ marginLeft: "15px" }}>
-                          Check in
-                        </Typography>
-                        <TimePicker
-                          value={checkInInput}
-                          onChange={(newValue) => setCheckInInput(newValue)}
-                          renderInput={(params) => <TextField {...params} />}
-                        />
-                      </Box>
-                      <Box>
-                        <Typography sx={{ marginLeft: "15px" }}>
-                          Check out
-                        </Typography>
-                        <TimePicker
-                          value={checkOutInput}
-                          onChange={(newValue) => {
-                            setCheckoutInput(newValue);
+                          value={direccionInput}
+                          InputProps={{
+                            startAdornment: (
+                              <InputAdornment position="start">
+                                <DirectionsIcon
+                                  fontSize="15px"
+                                  sx={{ pb: 2 }}
+                                />
+                              </InputAdornment>
+                            ),
                           }}
-                          renderInput={(params) => <TextField {...params} />}
                         />
+                      </Box>
+                      <Box className="input">
+                        <Typography
+                          sx={{ marginLeft: "15px", marginTop: "20px" }}
+                        >
+                          Dirección recogida de llaves
+                        </Typography>
+                        <TextField
+                          id="filled-textarea-direccion"
+                          placeholder="Dirección llaves"
+                          multiline
+                          variant="outlined"
+                          fullWidth
+                          onChange={(newValue) =>
+                            setDireccionLlavesInput(newValue.target.value)
+                          }
+                          value={direccionLlavesInput}
+                          InputProps={{
+                            startAdornment: (
+                              <InputAdornment position="start">
+                                <DirectionsIcon
+                                  fontSize="15px"
+                                  sx={{ pb: 2 }}
+                                />
+                              </InputAdornment>
+                            ),
+                          }}
+                        />
+                      </Box>
+                      <Box paddingTop={3}>
+                        <MapContainer
+                          center={[36.72016, -4.42034]}
+                          zoom={17}
+                          style={{ height: "50vh", width: "50wh" }}
+                        >
+                          <LocationMarker />
+                          <TileLayer
+                            attribution='&amp;copy <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+                            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                          />
+                          <Box sx={{ height: "50%" }}></Box>
+                        </MapContainer>
                       </Box>
                     </Stack>
                   </Box>
-                </Stack>
-              </Box>
-            )}
-            {precioTab && (
-              <Box marginTop={2} border={1}>
-                <Grid
-                  container
-                  direction="row"
-                  justifyContent="flex-start"
-                  alignItems="center"
-                  padding={2}
-                >
-                  <Grid item xs={4}>
-                    <Box>
-                      <InputLabel htmlFor="input-precio-noche" sx={{ pr: 10 }}>
-                        Precio por noche
-                      </InputLabel>
-                      <Input
-                        id="input-precio-noche"
-                        type="number"
-                        onChange={(newValue) =>
-                          setPrecioNoche(Number(newValue.target.value))
-                        }
-                        value={precioNoche}
-                        startAdornment={
-                          <InputAdornment position="start">
-                            <EuroIcon />
-                          </InputAdornment>
-                        }
-                      />
-                    </Box>
-                  </Grid>
-                </Grid>
-              </Box>
-            )}
-            {direccionTab && (
-              <Box marginTop={2} border={1}>
-                <Box p={2}>
-                  <Stack spacing={0} padding={0}>
-                    <Box className="input">
-                      <Typography sx={{ marginLeft: "15px" }}>
-                        Dirección del alojamiento
+                </Box>
+              )}
+              {imagenesTab && (
+                <Box marginTop={2} border={1}>
+                  <Box p={2}>
+                    <button
+                      id="upload-widget"
+                      className="cloudinary-button"
+                      onClick={uploadWidget}
+                    >
+                      Subir imágenes
+                    </button>
+                    <ImageList sx={{ width: 1 }} cols={3} rowHeight={200}>
+                      {images.map((image) => (
+                        <ImageListItem key={image.public_id}>
+                          <img src={image.url} />
+                        </ImageListItem>
+                      ))}
+                    </ImageList>
+                  </Box>
+                </Box>
+              )}
+              {descriptionTab && (
+                <Box marginTop={2} border={1}>
+                  <Box p={2}>
+                    <Typography variant="h5" color="primary">
+                      Resumen{" "}
+                    </Typography>
+                    <Stack spacing={2} paddingY={2}>
+                      <Typography>Título: {tituloInput}</Typography>
+                      <Typography>Descripción: {descripcionInput}</Typography>
+                      <Typography>Capacidad: {capacidades}</Typography>
+                      <Typography>
+                        Check-In: {checkInInput.format("HH:mm:ss")}
                       </Typography>
-                      <TextField
-                        id="filled-textarea-direccion"
-                        placeholder="Dirección del alojamiento"
-                        multiline
-                        variant="outlined"
-                        fullWidth
-                        onChange={(newValue) =>
-                          setDireccionInput(newValue.target.value)
-                        }
-                        value={direccionInput}
-                        InputProps={{
-                          startAdornment: (
-                            <InputAdornment position="start">
-                              <DirectionsIcon fontSize="15px" sx={{ pb: 2 }} />
-                            </InputAdornment>
-                          ),
-                        }}
-                      />
-                    </Box>
-                    <Box className="input">
-                      <Typography sx={{ marginLeft: "15px", marginTop: "20px" }}>
-                        Dirección recogida de llaves
+                      <Typography>
+                        Check-Out: {checkInInput.format("HH:mm:ss")}
                       </Typography>
-                      <TextField
-                        id="filled-textarea-direccion"
-                        placeholder="Dirección llaves"
-                        multiline
-                        variant="outlined"
-                        fullWidth
-                        onChange={(newValue) =>
-                          setDireccionLlavesInput(newValue.target.value)
-                        }
-                        value={direccionLlavesInput}
-                        InputProps={{
-                          startAdornment: (
-                            <InputAdornment position="start">
-                              <DirectionsIcon fontSize="15px" sx={{ pb: 2 }} />
-                            </InputAdornment>
-                          ),
-                        }}
-                      />
-                    </Box>
-                    <Box paddingTop={3}>
-                      <MapContainer
-                        center={[36.72016,-4.42034]}
-                        zoom={17}
-                        style={{ height: "50vh", width: "50wh" }}
-                      >
-                        <LocationMarker />
-                        <TileLayer
-                          attribution='&amp;copy <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
-                          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                        />
-                        <Box sx={{ height: "50%" }}></Box>
-                      </MapContainer>
-                    </Box>
-                  </Stack>
+                      <Typography>Precio por noche: {precioNoche}</Typography>
+                      <Typography>
+                        Dirección del alojamiento: {direccionInput}
+                      </Typography>
+                      <Typography>
+                        Dirección de recogida de llaves: {direccionLlavesInput}
+                      </Typography>
+                    </Stack>
+                    <LoadingButton
+                      loading={loading}
+                      onClick={handleSubmit}
+                      sx={{
+                        margin: "auto",
+                        background: "#92aac0",
+                        "&:hover": {
+                          color: "#FFF",
+                          backgroundColor: "#47adb4",
+                        },
+                      }}
+                    >
+                      Confirmar
+                    </LoadingButton>
+                  </Box>
                 </Box>
-              </Box>
-            )}
-            {imagenesTab && (
-              <Box marginTop={2} border={1}>
-                <Box p={2}>
-                <button id="upload-widget" className="cloudinary-button" onClick={uploadWidget}>
-                          Subir imágenes
-                        </button>
-                  <ImageList sx={{ width: 1 }} cols={3} rowHeight={200}>
-                    {images.map((image) => (
-                      <ImageListItem key={image.public_id}>
-                        <img
-                          src={image.url}
-                        />
-                      </ImageListItem>
-                    ))}
-                  </ImageList>
-                </Box>
-              </Box>
-            )}
-            {descriptionTab && (
-              <Box marginTop={2} border={1}>
-                <Box p={2}>
-                  <Typography variant="h5" color="primary">
-                    Resumen{" "}
-                  </Typography>
-                  <Stack spacing={2} paddingY={2}>
-                    <Typography>Título: {tituloInput}</Typography>
-                    <Typography>Descripción: {descripcionInput}</Typography>
-                    <Typography>Capacidad: {capacidades}</Typography>
-                    <Typography>
-                      Check-In: {checkInInput.format("HH:mm:ss")}
-                    </Typography>
-                    <Typography>
-                      Check-Out: {checkInInput.format("HH:mm:ss")}
-                    </Typography>
-                    <Typography>Precio por noche: {precioNoche}</Typography>
-                    <Typography>
-                      Dirección del alojamiento: {direccionInput}
-                    </Typography>
-                    <Typography>
-                      Dirección de recogida de llaves: {direccionLlavesInput}
-                    </Typography>
-                  </Stack>
-                  <LoadingButton
-                    loading={loading}
-                    onClick={handleSubmit}
-                    sx={{
-                      margin: "auto",
-                      background: "#92aac0",
-                      "&:hover": { color: "#FFF", backgroundColor: "#47adb4" },
-                    }}
-                  >
-                    Confirmar
-                  </LoadingButton>
-                </Box>
-              </Box>
-            )}
-          </Box>
-        </Container>
-      </LocalizationProvider >
+              )}
+            </Box>
+          </Container>
+        </LocalizationProvider>
       )}
     </>
   );

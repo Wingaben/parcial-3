@@ -10,7 +10,7 @@ import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
 import { Container } from "@mui/system";
-import { UsuarioContext } from './UsuarioContext';
+import { UsuarioContext } from "./UsuarioContext";
 import { useNavigate } from "react-router-dom";
 
 function MisReservas() {
@@ -19,12 +19,15 @@ function MisReservas() {
   const { user, setUser } = useContext(UsuarioContext);
   const navigate = useNavigate();
   const estadoA = "aceptada";
-  const estadoB = "pagada"
-  const [today, setToday] = useState(new Date);
-  const rutaA = `${"http://localhost:8081/api/reservas/" + user.sub + "?estado=" + estadoA
-    }`;
-    const rutaB = `${"http://localhost:8081/api/reservas/" + user.sub + "?estado=" + estadoB
-    }`;
+  const estadoB = "pagada";
+  const [today, setToday] = useState(new Date());
+  var ruta =
+    import.meta.env.MODE === "development"
+      ? import.meta.env.VITE_LOCALHOST_URL
+      : import.meta.env.VITE_LANDBNB_URL;
+
+  const rutaA = `${ruta + "/api/reservas/" + user.sub + "?estado=" + estadoA}`;
+  const rutaB = `${ruta + "/api/reservas/" + user.sub + "?estado=" + estadoB}`;
 
   const getData = () => {
     fetch(rutaA, {
@@ -41,20 +44,20 @@ function MisReservas() {
         console.log(myJson);
         setDataA(myJson);
       });
-      fetch(rutaB, {
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "application/json",
-        },
+    fetch(rutaB, {
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+    })
+      .then(function (response) {
+        console.log(response);
+        return response.json();
       })
-        .then(function (response) {
-          console.log(response);
-          return response.json();
-        })
-        .then(function (myJson) {
-          console.log(myJson);
-          setDataB(myJson);
-        });
+      .then(function (myJson) {
+        console.log(myJson);
+        setDataB(myJson);
+      });
   };
 
   useEffect(() => {
@@ -74,7 +77,7 @@ function MisReservas() {
   }
 
   function borrarReserva(id) {
-    const rutaBorrar = `${"http://localhost:8081/api/reservas/" + id}`;
+    const rutaBorrar = `${ruta + "/api/reservas/" + id}`;
     fetch(rutaBorrar, { method: "DELETE" });
     navigate("/");
   }
@@ -89,8 +92,10 @@ function MisReservas() {
     });
   }
 
-  function anadirResena(id) {
-    navigate("/AnadirResena/" + id);
+  function anadirResena(row) {
+    navigate("/AnadirResena/" + row.idAlojamiento, {
+      state: { dataRow: row },
+    });
   }
 
   function empezarChat(id) {
@@ -132,66 +137,82 @@ function MisReservas() {
         Reservas aceptadas
       </Typography>
       <TableContainer component={Paper}>
-        <Table sx={{ minWidth: 650 }} aria-label="simple table">
-          <TableHead>
-            <TableRow>
-              <TableCell>Título</TableCell>
-              <TableCell align="left">Fecha entrada</TableCell>
-              <TableCell align="left">Fecha salida</TableCell>
-              <TableCell align="left"></TableCell>
-              <TableCell align="left"></TableCell>
-              <TableCell align="left"></TableCell>
-              <TableCell align="left"></TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {dataA.map((row) => (
-              <TableRow
-                key={row.id}
-                sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
-              >
-                <TableCell component="th" scope="row">
-                  {row.tituloAlojamiento}
-                </TableCell>
-                <TableCell align="left">{formatDate(row.fechaEntrada)}</TableCell>
-                <TableCell align="left">{formatDate(row.fechaSalida)}</TableCell>
-                <TableCell align="left">
-                  <Button variant="contained" onClick={() => verAlojamiento(row.idAlojamiento)}>Ver</Button>
-                </TableCell>
-                <TableCell align="left">
-                  <Button
-                    variant="contained"
-                    color="warning"
-                    onClick={() => pagarAlojamiento(row, 'pagada')}
-                  >
-                    Pagar</Button>
-                </TableCell>
-                <TableCell align="left">
-                  <Button
-                    variant="contained"
-                    color="error"
-                    onClick={() => borrarReserva(row.id)}
-                  >
-                    Borrar
-                  </Button>
-                </TableCell>
-                {
-                  today.getTime() > new Date(row.fechaSalida).getTime() && (
-                    <TableCell align="left">
-                      <Button variant="contained" onClick={() => anadirResena(row.idAlojamiento)}>Añadir Reseña</Button>
-                    </TableCell>
-                  )
-                }
-                <TableCell align="left">
-                  <Button
-                    variant="contained"
-                    color="success"
-                    onClick={() => empezarChat(row.idAnfitrion)}>Chatear </Button>
-                </TableCell>
+        {dataA.length === 0 || dataA === undefined ? (
+          <Typography
+            variant="h5"
+            sx={{ margin: 3, fontWeight: 700, color: "gray" }}
+          >
+            {" "}
+            No tienes reservas aceptadas. 😔{" "}
+          </Typography>
+        ) : (
+          <Table sx={{ minWidth: 650 }} aria-label="simple table">
+            <TableHead>
+              <TableRow>
+                <TableCell>Título</TableCell>
+                <TableCell align="left">Fecha entrada</TableCell>
+                <TableCell align="left">Fecha salida</TableCell>
+                <TableCell align="left"></TableCell>
+                <TableCell align="left"></TableCell>
+                <TableCell align="left"></TableCell>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+            </TableHead>
+            <TableBody>
+              {dataA.map((row) => (
+                <TableRow
+                  key={row.id}
+                  sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
+                >
+                  <TableCell component="th" scope="row">
+                    {row.tituloAlojamiento}
+                  </TableCell>
+                  <TableCell align="left">
+                    {formatDate(row.fechaEntrada)}
+                  </TableCell>
+                  <TableCell align="left">
+                    {formatDate(row.fechaSalida)}
+                  </TableCell>
+                  <TableCell align="left">
+                    <Button
+                      variant="contained"
+                      onClick={() => verAlojamiento(row.idAlojamiento)}
+                    >
+                      Ver
+                    </Button>
+                  </TableCell>
+                  <TableCell align="left">
+                    <Button
+                      variant="contained"
+                      color="warning"
+                      onClick={() => pagarAlojamiento(row, "pagada")}
+                    >
+                      Pagar
+                    </Button>
+                  </TableCell>
+                  <TableCell align="left">
+                    <Button
+                      variant="contained"
+                      color="error"
+                      onClick={() => borrarReserva(row.id)}
+                    >
+                      Borrar
+                    </Button>
+                  </TableCell>
+
+                  <TableCell align="left">
+                    <Button
+                      variant="contained"
+                      color="success"
+                      onClick={() => empezarChat(row.idAnfitrion)}
+                    >
+                      Chatear{" "}
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        )}
       </TableContainer>
       <Typography
         variant="h5"
@@ -210,60 +231,85 @@ function MisReservas() {
         Reservas pagadas
       </Typography>
       <TableContainer component={Paper}>
-        <Table sx={{ minWidth: 650 }} aria-label="simple table">
-          <TableHead>
-            <TableRow>
-              <TableCell>Título</TableCell>
-              <TableCell align="left">Fecha entrada</TableCell>
-              <TableCell align="left">Fecha salida</TableCell>
-              <TableCell align="left"></TableCell>
-              <TableCell align="left"></TableCell>
-              <TableCell align="left"></TableCell>
-              <TableCell align="left"></TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {dataB.map((row) => (
-              <TableRow
-                key={row.id}
-                sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
-              >
-                <TableCell component="th" scope="row">
-                  {row.tituloAlojamiento}
-                </TableCell>
-                <TableCell align="left">{formatDate(row.fechaEntrada)}</TableCell>
-                <TableCell align="left">{formatDate(row.fechaSalida)}</TableCell>
-                <TableCell align="left">
-                  <Button variant="contained" onClick={() => verAlojamiento(row.idAlojamiento)}>Ver</Button>
-                </TableCell>
-                <TableCell align="left">
-                </TableCell>
-                <TableCell align="left">
-                  <Button
-                    variant="contained"
-                    color="error"
-                    onClick={() => borrarReserva(row.id)}
-                  >
-                    Borrar
-                  </Button>
-                </TableCell>
-                {
-                  today.getTime() > new Date(row.fechaSalida).getTime() && (
-                    <TableCell align="left">
-                      <Button variant="contained" onClick={() => anadirResena(row.idAlojamiento)}>Añadir Reseña</Button>
-                    </TableCell>
-                  )
-                }
-                <TableCell align="left">
-                  <Button
-                    variant="contained"
-                    color="success"
-                    onClick={() => empezarChat(row.idAnfitrion)}>Chatear </Button>
-                </TableCell>
+        {dataB.length === 0 || dataB === undefined ? (
+          <Typography
+            variant="h5"
+            sx={{ margin: 3, fontWeight: 700, color: "gray" }}
+          >
+            {" "}
+            No tienes reservas pagadas. 💸{" "}
+          </Typography>
+        ) : (
+          <Table sx={{ minWidth: 650 }} aria-label="simple table">
+            <TableHead>
+              <TableRow>
+                <TableCell>Título</TableCell>
+                <TableCell align="left">Fecha entrada</TableCell>
+                <TableCell align="left">Fecha salida</TableCell>
+                <TableCell align="left"></TableCell>
+                <TableCell align="left"></TableCell>
+                <TableCell align="left"></TableCell>
+                <TableCell align="left"></TableCell>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+            </TableHead>
+            <TableBody>
+              {dataB.map((row) => (
+                <TableRow
+                  key={row.id}
+                  sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
+                >
+                  <TableCell component="th" scope="row">
+                    {row.tituloAlojamiento}
+                  </TableCell>
+                  <TableCell align="left">
+                    {formatDate(row.fechaEntrada)}
+                  </TableCell>
+                  <TableCell align="left">
+                    {formatDate(row.fechaSalida)}
+                  </TableCell>
+                  <TableCell align="left">
+                    <Button
+                      variant="contained"
+                      onClick={() => verAlojamiento(row.idAlojamiento)}
+                    >
+                      Ver
+                    </Button>
+                  </TableCell>
+                  <TableCell align="left"></TableCell>
+                  <TableCell align="left">
+                    <Button
+                      variant="contained"
+                      color="error"
+                      onClick={() => borrarReserva(row.id)}
+                    >
+                      Borrar
+                    </Button>
+                  </TableCell>
+                  {today.getTime() > new Date(row.fechaSalida).getTime() &&
+                    row.estado !== "valorada" && (
+                      <TableCell align="left">
+                        <Button
+                          variant="contained"
+                          onClick={() => anadirResena(row)}
+                        >
+                          Añadir reseña
+                        </Button>
+                      </TableCell>
+                    )}
+                  <TableCell align="left">
+                    <Button
+                      variant="contained"
+                      color="success"
+                      onClick={() => empezarChat(row.idAnfitrion)}
+                    >
+                      Chatear{" "}
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        )}
       </TableContainer>
     </Container>
   );

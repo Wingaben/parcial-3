@@ -23,12 +23,10 @@ function EditarMiPerfil() {
   const [telefonoInput, setTelefonoInput] = useState("");
   const [direccionInput, setDireccionInput] = useState("");
 
-  const ruta = `${
-    "http://localhost:8081/api/usuarios/" + user.sub
-  }`;
+  var ruta = (import.meta.env.MODE==='development' ? import.meta.env.VITE_LOCALHOST_URL : import.meta.env.VITE_LANDBNB_URL);
 
   const getData = () => {
-    fetch(ruta, {
+    fetch(ruta + "/api/usuarios/" + user.sub, {
       headers: {
         "Content-Type": "application/json",
         Accept: "application/json",
@@ -78,7 +76,7 @@ function EditarMiPerfil() {
       telefono,
     };
 
-    fetch("http://localhost:8081/api/usuarios/" + user.sub, {
+    fetch(ruta + "/api/usuarios/" + user.sub, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(usuario),

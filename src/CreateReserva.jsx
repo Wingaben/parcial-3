@@ -24,8 +24,12 @@ import "leaflet/dist/leaflet.css";
 function CreateReserva() {
   const [fechaEntradaInput, setfechaEntrada] = useState(dayjs());
   const [fechaSalidaInput, setfechaSalida] = useState(dayjs());
+  const [fechaEntradaDayjs, setFechaEntradaDayjs] = useState(dayjs());
+  const [fechaSalidaDayjs, setFechaSalidaDayjs] = useState(dayjs());
   const [mostrarBotonReservar, setMostrarBotonReservar] = useState(false);
   const { user, setUser } = useContext(UsuarioContext);
+
+  var ruta = (import.meta.env.MODE==='development' ? import.meta.env.VITE_LOCALHOST_URL : import.meta.env.VITE_LANDBNB_URL);
 
   const [loading, setLoading] = useState(false);
   
@@ -39,9 +43,10 @@ function CreateReserva() {
     setLoading(true);
     const fechaEntrada = fechaEntradaInput;
     const fechaSalida = fechaSalidaInput;
-    const idAnfitrion = data.idAnfitrion 
+    const idAnfitrion = data.idAnfitrion;
     const idAlojamiento = idAlojamientoLink;
     const idHuesped = user.sub;
+    const precioTotal = dayjs(fechaSalidaDayjs).diff(fechaEntradaDayjs, 'day') * data.precio
     const tituloAlojamiento = data.titulo;
     const estado = "pendiente"
     const reserva = {
@@ -50,10 +55,11 @@ function CreateReserva() {
       idAnfitrion, // Owner
       idHuesped,// Invited
       idAlojamiento,
+      precioTotal,
       tituloAlojamiento,
       estado
     };
-    fetch("http://localhost:8081/api/reservas", {
+    fetch(ruta + "/api/reservas", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(reserva),
@@ -73,16 +79,18 @@ function CreateReserva() {
   const [reservasLoaded, setReservasLoaded] = useState(false);
   const idAlojamientoLink = /[^/]*$/.exec(window.location.href)[0];
   const [value, setValue] = useState([null, null]);
-  const rutaApi = `${"http://localhost:8081/api/alojamientos/"}`+idAlojamientoLink;
-  const rutaApiReservasAlojamiento = `${"http://localhost:8081/api/reservas?alojamiento="}`+idAlojamientoLink;
+  const rutaApi = `${ruta + "/api/alojamientos/"}`+idAlojamientoLink;
+  const rutaApiReservasAlojamiento = `${ruta + "/api/reservas?idAlojamiento="}`+idAlojamientoLink;
   
   function disableWeekends(date) {    
     if(reservasAlojamiento.length>0)
     {
       for (var i = 0; i < reservasAlojamiento.length; i++)
       {
-        if(date == Date.parse(reservasAlojamiento[i].fechaEntrada) || date == Date.parse(reservasAlojamiento[i].fechaSalida) 
-        || (date > Date.parse(reservasAlojamiento[i].fechaEntrada)&&(date < Date.parse(reservasAlojamiento[i].fechaSalida))))
+        console.log("date:" + formatDate(date));
+        console.log("fe" + formatDate(reservasAlojamiento[i].fechaEntrada));
+        if(formatDate(date) === formatDate(reservasAlojamiento[i].fechaEntrada) || formatDate(date) === formatDate(reservasAlojamiento[i].fechaSalida) 
+        || (Date.parse(date) >= Date.parse(reservasAlojamiento[i].fechaEntrada) && (Date.parse(date) <= Date.parse(reservasAlojamiento[i].fechaSalida))))
         {
           return true;
         }
@@ -134,6 +142,7 @@ function CreateReserva() {
         return response.json();
       })
       .then(function (myJson) {
+        console.log(myJson);
         setReservasAlojamiento(myJson);
         setReservasLoaded(true)
       });
@@ -309,9 +318,18 @@ function CreateReserva() {
                   value={value}
                   shouldDisableDate={disableWeekends}
                   onChange={(newValue) => {
+
+                   
                     setValue(newValue);
+
+                    setFechaEntradaDayjs(dayjs(newValue[0]))
+                    setFechaSalidaDayjs(dayjs(newValue[1]))
+
                     setfechaEntrada(formatDate(newValue[0]));
+                    console.log(formatDate(newValue[0]));
                     setfechaSalida(formatDate(newValue[1]));
+                    
+                    console.log(formatDate(newValue[1]));
                     if(newValue[0]!=null && newValue[1]!=null)
                     {
                       setMostrarBotonReservar(true);

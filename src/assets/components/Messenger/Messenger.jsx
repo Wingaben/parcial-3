@@ -13,19 +13,16 @@ export default function Messenger() {
   const [data, setData] = useState([]);
   const [messageField, setMessageField] = useState("");
   const idReceptorEnlace = /[^/]*$/.exec(window.location.href)[0];
-  const {loading , setLoading } = useState(false)
-  
+  const {loading , setLoading } = useState(false);
+  const [receptor, setReceptor] = useState("");
+  const [receptorApellidos, setReceptorApellidos] = useState("");
+
+  var ruta = (import.meta.env.MODE==='development' ? import.meta.env.VITE_LOCALHOST_URL : import.meta.env.VITE_LANDBNB_URL);  
 
   const usersub = user.sub;
 
-  const ruta =
-    "http://localhost:8081/api/mensaje?idReceptor=" +
-    usersub +
-    "&idRemitente=" +
-    idReceptorEnlace;
-
   const getData = () => {
-    fetch(ruta, {
+    fetch(ruta + "/api/mensaje?idReceptor=" + usersub + "&idRemitente=" + idReceptorEnlace, {
       headers: {
         "Content-Type": "application/json",
         Accept: "application/json",
@@ -38,6 +35,22 @@ export default function Messenger() {
       .then(function (myJson) {
         console.log(myJson);
         setData(myJson);
+
+        return fetch(ruta + "/api/usuarios/" + idReceptorEnlace, {
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+          },
+        })
+          .then(function (response) {
+            console.log(response);
+            return response.json();
+          })
+          .then(function (myJson) {
+            console.log(myJson);
+            setReceptor(myJson.nombre);
+            setReceptorApellidos(myJson.apellidos);
+          });
       });
   };
 
@@ -53,7 +66,7 @@ export default function Messenger() {
 
       const idReceptor = idReceptorEnlace
       const idRemitente = usersub;
-      const nombreReceptor = user.name; //test case
+      const nombreReceptor = receptor + " " + receptorApellidos;
       const nombreRemitente = user.name;
       const cuerpo = messageField;
 
@@ -65,13 +78,13 @@ export default function Messenger() {
         cuerpo,
       };
 
-      fetch("http://localhost:8081/api/mensaje", {
+      fetch(ruta + "/api/mensaje", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(mensajePost),
       }).then((response) => {
         getData();
-        setMessage("");
+        setMessageField("");
       });
     }
   };
@@ -124,7 +137,7 @@ export default function Messenger() {
                 message={item.cuerpo}
                 photoURL=""
                 timestamp={item.timestamp}
-                displayName={item.nombreReceptor}
+                displayName={item.nombreRemitente}
                 avatarDisp={true}
               />
             )

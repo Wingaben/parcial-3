@@ -5,10 +5,10 @@ import CarouselCard from "./CarouselCard";
 
 export default function LocationCards() {
   const [data, setData] = useState([]);
-  const ruta = `${"http://localhost:8081/api/alojamientos"}`;
+  var ruta = (import.meta.env.MODE==='development' ? import.meta.env.VITE_LOCALHOST_URL : import.meta.env.VITE_LANDBNB_URL);
 
   const getData = () => {
-    fetch(ruta, {
+    fetch(ruta + "/api/alojamientos", {
       headers: {
         "Content-Type": "application/json",
         Accept: "application/json",

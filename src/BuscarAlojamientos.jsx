@@ -2,7 +2,8 @@ import { CssBaseline, Typography } from "@mui/material";
 import React, { useState, useEffect } from "react";
 import { Box, Container } from "@mui/system";
 import { Grid, Button, Stack } from "@mui/material";
-import { useLocation } from "react-router-dom";
+import CarouselCard from "./assets/components/CarouselCard";
+import { Navigate, useLocation } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import CircularProgress from "@mui/material/CircularProgress";
 import ReplayIcon from "@mui/icons-material/Replay";
@@ -14,18 +15,16 @@ function BuscarAlojamientos() {
   const navigate = useNavigate();
   const { ubicacion, fechaEntrada, fechaSalida, personas } = state;
 
-  const ruta = `${"http://localhost:8081/api/alojamientos?ubicacion=" +
-    ubicacion +
+  var ruta = (import.meta.env.MODE==='development' ? import.meta.env.VITE_LOCALHOST_URL : import.meta.env.VITE_LANDBNB_URL);
+
+  const getData = () => {
+    fetch(ruta + "/api/alojamientos?ubicacion=" + ubicacion +
     "&fechaEntrada=" +
     fechaEntrada +
     "&fechaSalida=" +
     fechaSalida +
     "&capacidad=" +
-    personas
-    }`;
-
-  const getData = () => {
-    fetch(ruta, {
+    personas, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -51,13 +50,13 @@ function BuscarAlojamientos() {
     <React.Fragment>
       <CssBaseline />
       {!loading && (
-        <container>
+        <Container>
           <Box
             sx={{ display: "flex", alignItems: "center", paddingTop: "20%" }}
           >
             <CircularProgress sx={{ alignSelf: "center", margin: "auto" }} />
           </Box>
-        </container>
+        </Container>
       )}
       {loading && (
         <Box
@@ -113,7 +112,7 @@ function BuscarAlojamientos() {
                           lg={3}
                           item={true}
                         >
-
+                          <CarouselCard location={row} />
                         </Grid>
                       );
                     })
