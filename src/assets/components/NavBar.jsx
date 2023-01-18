@@ -16,6 +16,9 @@ import { BrowserRouter as Router, Route, Routes, Link } from "react-router-dom";
 import { UsuarioContext } from "../../UsuarioContext";
 import { GoogleLogin } from "@react-oauth/google";
 import jwt_decode from "jwt-decode";
+import Button from "@mui/material/Button";
+
+import { useLocation, useNavigate } from "react-router-dom";
 
 function NavBar() {
   const [anchorElUser, setAnchorElUser] = React.useState(null);
@@ -25,6 +28,9 @@ function NavBar() {
   const [caducidad, setCaducidad] = useState("");
   const [token, setToken] = useState("");
   const [nombre, setNombre] = useState("");
+  const navigate = useNavigate();
+  const [isPerfilVisible, setIsPerfilVisible] = useState(false);
+
 
   var ruta =
     import.meta.env.MODE === "development"
@@ -59,7 +65,11 @@ function NavBar() {
       body: JSON.stringify(usuario),
     });
   };
-
+  function verPerfil(correo, nombre, conexion, caducidad, token) {
+    navigate("/MiPerfil/", {
+      state: { co: correo, n: nombre, c: conexion, ca: caducidad, t: token },
+    });
+  }
   return (
     <AppBar position="static">
       <Container maxWidth="xxl">
@@ -129,12 +139,22 @@ function NavBar() {
                   setConexion(decoded.iat);
                   setCaducidad(decoded.exp);
                   setToken(decoded.sub);
+                  setIsPerfilVisible(true);
                 }}
                 onError={() => {
                   console.log("Login Failed");
                 }}
                 auto_select
               />
+            )}
+            {isPerfilVisible && (
+              <Button
+                variant="contained"
+
+                onClick={() => verPerfil(correo, nombre, conexion, caducidad, token)}
+              >
+                Mi Perfil
+              </Button>
             )}
             <Menu
               sx={{ mt: "45px" }}
@@ -154,19 +174,15 @@ function NavBar() {
             >
 
 
-              <MenuItem
-                component={Link}
-                to="/MiPerfil"
-                onClick={() => handleCloseUserMenu()}
-              >
-                <Typography textAlign="center">Mi Perfil</Typography>
-              </MenuItem>
+              
 
 
               <MenuItem
                 onClick={() => {
                   sessionStorage.clear();
+                  setIsPerfilVisible(false);
                   googleLogout();
+
                 }}
                 component="a"
                 href="/"

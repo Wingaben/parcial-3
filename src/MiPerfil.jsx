@@ -11,11 +11,14 @@ import LocalPhoneIcon from "@mui/icons-material/LocalPhone";
 import LocationOnIcon from "@mui/icons-material/LocationOn";
 import { UsuarioContext } from "./UsuarioContext";
 import { useNavigate } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 
 function MiPerfil() {
   const { user, setUser } = useContext(UsuarioContext);
   const [data, setData] = useState([]);
   const navigate = useNavigate();
+  const { state } = useLocation();
+  const { co, n, c, ca, t } = state;
 
   var ruta =
     import.meta.env.MODE === "development"
@@ -43,9 +46,6 @@ function MiPerfil() {
     getData();
   }, []);
 
-  function modificarPerfil() {
-    navigate("/EditarMiPerfil");
-  }
 
   return (
     <Container>
@@ -97,7 +97,7 @@ function MiPerfil() {
               >
                 <EmailIcon />
                 <Typography variant="h6" sx={{ paddingLeft: 2 }}>
-                  {data.email}
+                  {co}
                 </Typography>
               </Box>
               <Box
@@ -110,7 +110,7 @@ function MiPerfil() {
               >
                 <Typography>Nombre: </Typography>
                 <Typography variant="h6" sx={{ paddingLeft: 2 }}>
-                  {data.nombre}
+                  {n}
                 </Typography>
               </Box>
               <Box
@@ -123,7 +123,7 @@ function MiPerfil() {
               >
                 <Typography>Conexión: </Typography>
                 <Typography variant="h6" sx={{ paddingLeft: 2 }}>
-                  {data.conexion}
+                  {c}
                 </Typography>
               </Box>
               <Box
@@ -136,7 +136,7 @@ function MiPerfil() {
               >
                 <Typography>Caducidad: </Typography>
                 <Typography variant="h6" sx={{ paddingLeft: 2 }}>
-                  {data.caducidad}
+                  {ca}
                 </Typography>
               </Box>
               <Box
@@ -149,7 +149,7 @@ function MiPerfil() {
               >
                 <Typography>Token de identificación: </Typography>
                 <Typography variant="h6" sx={{ paddingLeft: 2 }}>
-                  {data.id}
+                  {t}
                 </Typography>
               </Box>
               <Box

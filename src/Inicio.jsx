@@ -73,6 +73,7 @@ function Inicio() {
   
   return (
     <Container maxWidth="xl">
+      <Button>Mi Perfil</Button>
       <Box paddingTop={3}>
         <MapContainer
           center={[36.72016, -4.42034]}
