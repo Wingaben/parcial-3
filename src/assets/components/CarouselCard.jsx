@@ -4,7 +4,6 @@ import KeyboardArrowLeft from "@mui/icons-material/KeyboardArrowLeft";
 import KeyboardArrowRight from "@mui/icons-material/KeyboardArrowRight";
 import MobileStepper from "@mui/material/MobileStepper";
 import { Box, Typography, Button } from "@mui/material";
-import SwipeableViews from "react-swipeable-views";
 import StarIcon from "@mui/icons-material/Star";
 import GroupIcon from "@mui/icons-material/Group";
 import "../css/global.css";
@@ -49,29 +48,6 @@ const CarouselCard = ({ location }) => {
         padding: "20px",
       }}
     >
-      {location.fotos.length && (
-        <SwipeableViews
-          axis={"x"}
-          index={activeStep}
-          onChangeIndex={handleStepChange}
-          enableMouseEvents
-          onClick={routeChange}
-          style={{ cursor: "pointer" }}
-        >
-          {location.fotos.map((step, index) => {
-            return (
-              <div key={step.id}>
-                <Box
-                  component="img"
-                  sx={carouselImage}
-                  src={step.url}
-                  alt={step.id}
-                ></Box>
-              </div>
-            );
-          })}
-        </SwipeableViews>
-      )}
 
       <Box sx={fixedBottom}>
         {location.fotos.length > 1 && (

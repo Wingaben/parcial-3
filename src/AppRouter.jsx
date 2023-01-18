@@ -20,6 +20,9 @@ import Messenger from "./assets/components/Messenger/Messenger";
 import AnadirResena from "./AnadirResena";
 import Provider from "./UsuarioContext";
 import Payments from "./Payments"
+import CrearPerfil from "./CrearPerfil"
+import ModificarPerfil from "./ModificarPerfil"
+import Perfil from "./Perfil"
 
 const AppRouter = () => {
     
@@ -30,6 +33,9 @@ const AppRouter = () => {
                 <NavBar/>
                 <Routes>
                     <Route path="/" element={<Inicio />} />
+                    <Route path="/Perfil" element={<Perfil />} />
+                    <Route path="/CrearPerfil" element={<CrearPerfil />} />
+                    <Route path="/ModificarPerfil" element={<ModificarPerfil />} />
                     <Route path="/Payments" element={<Payments />} />
                     <Route path="/CrearAlojamiento" element={<CrearAlojamiento />} />
                     <Route path="/MisAlojamientos" element={<MisAlojamientos />} />

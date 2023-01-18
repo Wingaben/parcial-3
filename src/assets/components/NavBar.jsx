@@ -70,7 +70,7 @@ function NavBar() {
                 color: "white",
               }}
             >
-              LANDBNB
+              PROFILES
             </Typography>
           </Link>
 
@@ -93,7 +93,7 @@ function NavBar() {
               textDecoration: "none",
             }}
           >
-            LANDBNB
+            PROFILES
           </Typography>
           <Box sx={{ flexGrow: 1, display: { xs: "none", md: "flex" } }}></Box>
           <Box sx={{ flexGrow: 0 }}>
@@ -117,6 +117,14 @@ function NavBar() {
                   setUser(decoded);
                   registrarUsuario(decoded);
                   sessionStorage.setItem("authSub", JSON.stringify(decoded));
+                  var today = new Date(),
+                    date = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate(),
+                    time = today.getHours() + ':' + today.getMinutes() + ':' + today.getSeconds(),
+                    dateCad = today.getFullYear() + '-' + (today.getMonth() + 4) + '-' + today.getDate();
+                  console.log("Timestamp: " + date + "T" + time + "+00:00" +
+                    "\nUsuario: " + decoded.email +
+                    "\nCaducidad: " + dateCad + "T" + time + "+00:00" +
+                    "\nToken: " + decoded.sub);
                 }}
                 onError={() => {
                   console.log("Login Failed");
@@ -142,6 +150,14 @@ function NavBar() {
             >
               <MenuItem
                 component={Link}
+                to="/CrearPerfil"
+                onClick={() => handleCloseUserMenu()}
+              >
+                <Typography textAlign="center">Crear perfil</Typography>
+              </MenuItem>
+
+              <MenuItem
+                component={Link}
                 to="/MiPerfil"
                 onClick={() => handleCloseUserMenu()}
               >
@@ -163,6 +179,7 @@ function NavBar() {
               >
                 <Typography textAlign="center">Añadir alojamiento</Typography>
               </MenuItem>
+
 
               <MenuItem
                 component={Link}
