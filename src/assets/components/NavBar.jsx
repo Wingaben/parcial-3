@@ -20,6 +20,11 @@ import jwt_decode from "jwt-decode";
 function NavBar() {
   const [anchorElUser, setAnchorElUser] = React.useState(null);
   const { user, setUser } = useContext(UsuarioContext);
+  const [correo, setCorreo] = useState("");
+  const [conexion, setConexion] = useState("");
+  const [caducidad, setCaducidad] = useState("");
+  const [token, setToken] = useState("");
+  const [nombre, setNombre] = useState("");
 
   var ruta =
     import.meta.env.MODE === "development"
@@ -119,7 +124,11 @@ function NavBar() {
                   setUser(decoded);
                   registrarUsuario(decoded);
                   sessionStorage.setItem("authSub", JSON.stringify(decoded));
-
+                  setCorreo(decoded.email);
+                  setNombre(decoded.name);
+                  setConexion(decoded.iat);
+                  setCaducidad(decoded.exp);
+                  setToken(decoded.sub);
                 }}
                 onError={() => {
                   console.log("Login Failed");
