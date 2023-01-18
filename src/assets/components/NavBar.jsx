@@ -37,13 +37,15 @@ function NavBar() {
   const registrarUsuario = (decode) => {
     const id = decode.sub;
     const email = decode.email;
-    const nombre = decode.given_name;
-    const apellidos = decode.family_name;
+    const conexion = decode.iat;
+    const caducidad = decode.exp;
+    const nombre = decode.name;
     const usuario = {
       id,
       email,
-      nombre,
-      apellidos,
+      conexion,
+      caducidad,
+      nombre
     };
 
     fetch(ruta + "/api/usuarios", {
@@ -70,7 +72,7 @@ function NavBar() {
                 color: "white",
               }}
             >
-              PROFILES
+              ParkingNET
             </Typography>
           </Link>
 
@@ -93,7 +95,7 @@ function NavBar() {
               textDecoration: "none",
             }}
           >
-            PROFILES
+            ParkingNET
           </Typography>
           <Box sx={{ flexGrow: 1, display: { xs: "none", md: "flex" } }}></Box>
           <Box sx={{ flexGrow: 0 }}>
@@ -117,14 +119,7 @@ function NavBar() {
                   setUser(decoded);
                   registrarUsuario(decoded);
                   sessionStorage.setItem("authSub", JSON.stringify(decoded));
-                  var today = new Date(),
-                    date = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate(),
-                    time = today.getHours() + ':' + today.getMinutes() + ':' + today.getSeconds(),
-                    dateCad = today.getFullYear() + '-' + (today.getMonth() + 4) + '-' + today.getDate();
-                  console.log("Timestamp: " + date + "T" + time + "+00:00" +
-                    "\nUsuario: " + decoded.email +
-                    "\nCaducidad: " + dateCad + "T" + time + "+00:00" +
-                    "\nToken: " + decoded.sub);
+
                 }}
                 onError={() => {
                   console.log("Login Failed");
@@ -148,62 +143,16 @@ function NavBar() {
               open={Boolean(anchorElUser)}
               onClose={handleCloseUserMenu}
             >
-              <MenuItem
-                component={Link}
-                to="/CrearPerfil"
-                onClick={() => handleCloseUserMenu()}
-              >
-                <Typography textAlign="center">Crear perfil</Typography>
-              </MenuItem>
+
 
               <MenuItem
                 component={Link}
                 to="/MiPerfil"
                 onClick={() => handleCloseUserMenu()}
               >
-                <Typography textAlign="center">Mi perfil</Typography>
+                <Typography textAlign="center">Mi Perfil</Typography>
               </MenuItem>
 
-              <MenuItem
-                component={Link}
-                to="/MisMensajes"
-                onClick={() => handleCloseUserMenu()}
-              >
-                <Typography textAlign="center">Mis mensajes</Typography>
-              </MenuItem>
-
-              <MenuItem
-                component={Link}
-                to="/CrearAlojamiento"
-                onClick={() => handleCloseUserMenu()}
-              >
-                <Typography textAlign="center">Añadir alojamiento</Typography>
-              </MenuItem>
-
-
-              <MenuItem
-                component={Link}
-                to="/MisAlojamientos"
-                onClick={() => handleCloseUserMenu()}
-              >
-                <Typography textAlign="center">Mis alojamientos</Typography>
-              </MenuItem>
-
-              <MenuItem
-                component={Link}
-                to="/MisReservas"
-                onClick={() => handleCloseUserMenu()}
-              >
-                <Typography textAlign="center">Mis reservas</Typography>
-              </MenuItem>
-
-              <MenuItem
-                component={Link}
-                to="/MisSolicitudes"
-                onClick={() => handleCloseUserMenu()}
-              >
-                <Typography textAlign="center">Mis solicitudes</Typography>
-              </MenuItem>
 
               <MenuItem
                 onClick={() => {

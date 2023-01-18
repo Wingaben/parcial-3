@@ -65,7 +65,7 @@ function MiPerfil() {
         <Stack spacing={3} p={3}>
           <Typography variant="h4" color="secondary">
             {" "}
-            Mi perfil
+            Mi Perfil
           </Typography>
           <Box>
             <Grid
@@ -74,67 +74,15 @@ function MiPerfil() {
               justifyContent="flex-start"
               alignItems="flex-start"
             >
-              <Grid item xs={4}>
+              <Grid item xs={5}>
                 <Image
-                  width={225}
-                  style={{ borderRadius: 16, aspectRatio: 3 / 2 }}
+                  width={250}
+                  style={{ borderRadius: 16, aspectRatio: 1 / 1 }}
                   src={user.picture}
                   showLoading
                 />
               </Grid>
-              <Grid item xs={8}>
-                <Stack paddingTop={3}>
-                  <Box
-                    sx={{
-                      display: "flex",
-                      alignItems: "center",
-                      paddingTop: 1,
-                      width: "100%",
-                    }}
-                  >
-                    <PersonPinIcon />
-                    <Typography variant="h6" sx={{ paddingLeft: 2 }}>
-                      {data.nombre + " " + data.apellidos}
-                    </Typography>
-                  </Box>
-                  <Box
-                    sx={{
-                      display: "flex",
-                      alignItems: "center",
-                      paddingTop: 1,
-                      width: "100%",
-                    }}
-                  >
-                    <CakeIcon />
-                    {data.fechaNacimiento ? (
-                      <div>
-                        <Typography variant="h6" sx={{ paddingLeft: 2 }}>
-                          {data.fechaNacimiento}
-                        </Typography>
-                      </div>
-                    ) : (
-                      <Typography variant="h6" sx={{ paddingLeft: 2 }}>
-                        Completa tu perfil
-                      </Typography>
-                    )}
-                  </Box>
-                  <Box
-                    sx={{
-                      display: "flex",
-                      alignItems: "center",
-                      paddingTop: 1,
-                      width: "100%",
-                    }}
-                  >
-                    <StarIcon />
-                    <Typography variant="h6" sx={{ paddingLeft: 2 }}>
-                      Valoracion del afinitrión:
-                    </Typography>
 
-                    <Rating value={data.valoracion ?? 0} readOnly />
-                  </Box>
-                </Stack>
-              </Grid>
             </Grid>
           </Box>
           <Box>
@@ -160,18 +108,10 @@ function MiPerfil() {
                   width: "100%",
                 }}
               >
-                <LocalPhoneIcon />
-                {data.telefono ? (
-                  <div>
-                    <Typography variant="h6" sx={{ paddingLeft: 2 }}>
-                      {data.telefono}
-                    </Typography>
-                  </div>
-                ) : (
-                  <Typography variant="h6" sx={{ paddingLeft: 2 }}>
-                    Completa tu perfil
-                  </Typography>
-                )}
+                <Typography>Nombre: </Typography>
+                <Typography variant="h6" sx={{ paddingLeft: 2 }}>
+                  {data.nombre}
+                </Typography>
               </Box>
               <Box
                 sx={{
@@ -181,18 +121,10 @@ function MiPerfil() {
                   width: "100%",
                 }}
               >
-                <LocationOnIcon />
-                {data.direccion ? (
-                  <div>
-                    <Typography variant="h6" sx={{ paddingLeft: 2 }}>
-                      {data.direccion}
-                    </Typography>
-                  </div>
-                ) : (
-                  <Typography variant="h6" sx={{ paddingLeft: 2 }}>
-                    Completa tu perfil
-                  </Typography>
-                )}
+                <Typography>Conexión: </Typography>
+                <Typography variant="h6" sx={{ paddingLeft: 2 }}>
+                  {data.conexion}
+                </Typography>
               </Box>
               <Box
                 sx={{
@@ -202,9 +134,32 @@ function MiPerfil() {
                   width: "100%",
                 }}
               >
-                <Button variant="contained" onClick={() => modificarPerfil()}>
-                  Modificar perfil
-                </Button>
+                <Typography>Caducidad: </Typography>
+                <Typography variant="h6" sx={{ paddingLeft: 2 }}>
+                  {data.caducidad}
+                </Typography>
+              </Box>
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  paddingTop: 1,
+                  width: "100%",
+                }}
+              >
+                <Typography>Token de identificación: </Typography>
+                <Typography variant="h6" sx={{ paddingLeft: 2 }}>
+                  {data.id}
+                </Typography>
+              </Box>
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  paddingTop: 1,
+                  width: "100%",
+                }}
+              >
               </Box>
             </Stack>
           </Box>

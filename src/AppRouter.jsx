@@ -33,7 +33,7 @@ const AppRouter = () => {
                 <NavBar/>
                 <Routes>
                     <Route path="/" element={<Inicio />} />
-                    <Route path="/Perfil" element={<Perfil />} />
+                    <Route path="/MiPerfil" element={<MiPerfil />} />
                     <Route path="/CrearPerfil" element={<CrearPerfil />} />
                     <Route path="/ModificarPerfil" element={<ModificarPerfil />} />
                     <Route path="/Payments" element={<Payments />} />
