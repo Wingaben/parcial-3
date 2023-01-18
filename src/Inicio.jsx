@@ -15,6 +15,8 @@ import {
   useMapEvents,
 } from "react-leaflet";
 
+import markerIconPng from "leaflet/dist/images/marker-icon.png"
+import {Icon} from 'leaflet'
 function Inicio() {
   const [ubicacion, setUbicacion] = useState("España");
   const [personas, setPersonas] = useState(1);
@@ -60,8 +62,8 @@ function Inicio() {
     });
 
     return position === null ? null : (
-      <Marker position={position}>
-        <Popup>Tu alojamiento se encuentra aquí.</Popup>
+      <Marker position={position} icon={new Icon({iconUrl: markerIconPng, iconSize: [25, 41], iconAnchor: [12, 41]})}>
+        <Popup>Te encuentras aquí.</Popup>
       </Marker>
     );
   };
